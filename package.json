@@ -10,6 +10,11 @@
     "assets": "python3 blender/build_assets.py",
     "test": "node tools/playthrough.mjs"
   },
-  "dependencies": { "three": "^0.187.0" },
-  "devDependencies": { "vite": "^7.0.0" }
+  "dependencies": {
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.1",
+    "vite": "^7.0.0"
+  }
 }
