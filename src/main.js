@@ -7,7 +7,8 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import content from '../content/chapter1.json';
+import chapter1 from '../content/chapter1.json';
+import chapter2 from '../content/chapter2.json';
 import { initAudio, sfx, startMusic, setMusic, toggleMute, NOTES } from './audio.js';
 import { portraitCanvas, drawKid, drawAncestor } from './portraits.js';
 import './style.css';
@@ -15,6 +16,7 @@ import './style.css';
 const $ = (id) => document.getElementById(id);
 const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
 const params = new URLSearchParams(location.search);
+const content = params.get('ch') === '2' ? chapter2 : chapter1; // ?ch=2 = Capitulo 2 (prototipo)
 const LOWFX = params.get('fx') === '0';
 const TEST = params.get('test') === '1'; // caminhada instantanea para o teste automatizado
 const KIDS = Object.fromEntries(content.party.map((k) => [k.id, k]));
@@ -23,6 +25,7 @@ const VERBS = [['look', 'Olhar'], ['take', 'Pegar'], ['use', 'Usar'], ['talk', '
 // ------------------------------------------------------------------ estado
 const S = {
   room: null, active: content.start.active, flags: new Set(), inv: [], hp: {}, looked: new Set(),
+  team: content.party.map((k) => k.id), loc: {}, // equipe do capitulo e sala onde cada crianca esta
   verb: null, item: null, hover: null, busy: true, cut: false, skipping: false, objective: '', ended: false,
 };
 content.party.forEach((k) => (S.hp[k.id] = k.hp));
@@ -161,8 +164,24 @@ class Actor {
 // ------------------------------------------------------------------ salas
 const visibleDeep = (o) => { for (let n = o; n; n = n.parent) if (!n.visible) return false; return true; };
 
+// sala sem arte (prototipo): monta caixas coloridas a partir de cfg.blockout, com os mesmos nomes hs_/st_ do Blender
+function blockoutScene(cfg) {
+  const g = new THREE.Group(), w = cfg.walk, box = (name, [x, y, z], [sx, sy, sz], color) => {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), new THREE.MeshStandardMaterial({ color, roughness: 0.85 }));
+    m.name = name; m.position.set(x, y, z); g.add(m); return m;
+  };
+  box('floor', [(w.minX + w.maxX) / 2, -0.05, (w.minZ + w.maxZ) / 2], [w.maxX - w.minX + 4, 0.1, w.maxZ - w.minZ + 4], cfg.floor || '#2a2330');
+  box('wall_back', [(w.minX + w.maxX) / 2, 2.6, w.minZ - 1.3], [w.maxX - w.minX + 4, 5.2, 0.3], cfg.wall || '#1b1626');
+  cfg.blockout.forEach(([name, pos, size, color]) => {
+    const m = box(name, pos, size, color);
+    if (name.startsWith('glow_')) m.material.emissive.set(color);
+  });
+  return { scene: g };
+}
 function setupRoom(id, gltf) {
-  const cfg = content.rooms[id], group = gltf.scene, nodes = {}, hs = {}, glows = [], wins = [];
+  const cfg = content.rooms[id];
+  if (!gltf) gltf = blockoutScene(cfg);
+  const group = gltf.scene, nodes = {}, hs = {}, glows = [], wins = [];
   group.traverse((o) => {
     if (!nodes[o.name]) nodes[o.name] = o;
     if (o.name.startsWith('hs_')) hs[o.name.slice(3)] = o;
@@ -196,6 +215,12 @@ function setupRoom(id, gltf) {
     stars.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3));
     group.add(new THREE.Points(stars, new THREE.PointsMaterial({ color: 0xcfd8ff, size: 0.5, fog: false })));
     nodes.moon.material.fog = false;
+  } else if (cfg.blockout) {
+    room.bg = 0x05040a; room.fog = [0x05040a, 0.02];
+    add('hemi', new THREE.HemisphereLight(0x9a8fc8, 0x1a1424, 0.9));
+    const key = add('key', new THREE.DirectionalLight(0xffe6c8, 1.1)); key.position.set(3, 10, 10);
+    pt('lampA', 0xb98cff, -3, 3.2, -3, 14).intensity = 14; pt('lampB', 0xffc878, 3, 3.2, -3, 14).intensity = 12;
+    room.dungeon = false;
   } else {
     room.bg = 0x05040a; room.fog = [0x05040a, 0.012];
     add('hemi', new THREE.HemisphereLight(0x8a7fb8, 0x15101c, 0.35));
@@ -222,26 +247,41 @@ function setupRoom(id, gltf) {
   rooms[id] = room;
 }
 
-function enterRoom(id) {
+// mostra a sala (troca de cenario e camera) sem mexer em quem esta onde
+function showRoom(id) {
   if (S.room) scene.remove(rooms[S.room].group);
   const room = rooms[id];
   S.room = id; S.hover = null;
   scene.add(room.group);
   scene.background = new THREE.Color(room.bg);
   scene.fog = new THREE.FogExp2(room.fog[0], room.fog[1]);
-  content.party.forEach((k, i) => {
-    const [x, z, deg] = room.cfg.spawn[i], a = actors[k.id];
-    a.place(x, z, deg);
-    if (room.cfg.focus) { a.face(...room.cfg.focus); a.root.rotation.y = a.faceTo; }
-  });
-  setMusic(id === 'hall' ? 'dungeon' : 'garden');
+  content.party.forEach((k) => { actors[k.id].root.visible = S.team.includes(k.id) && S.loc[k.id] === id; });
+  setMusic(room.cfg.music || (id === 'hall' ? 'dungeon' : 'garden'));
   camReset(0);
   resize();
 }
+function spawnOf(room, kid) {
+  const sp = room.cfg.spawn;
+  return Array.isArray(sp) ? sp[content.party.findIndex((k) => k.id === kid)] : sp[kid] || sp.default;
+}
+function placeKid(id, roomId) {
+  const room = rooms[roomId], [x, z, deg] = spawnOf(room, id), a = actors[id];
+  S.loc[id] = roomId;
+  a.place(x, z, deg);
+  if (room.cfg.focus) { a.face(...room.cfg.focus); a.root.rotation.y = a.faceTo; }
+}
+// leva a equipe toda para a sala e mostra
+function enterRoom(id) {
+  S.team.forEach((k) => placeKid(k, id));
+  showRoom(id);
+}
 
 function show(names, v) {
+  names.forEach((n0) => { // "sala:no" mexe num no de outra sala (o hall puxa a grade do porao)
+    const [rid, n] = n0.includes(':') ? n0.split(':') : [S.room, n0], node = rooms[rid].nodes[n];
+    if (node) node.visible = v;
+  });
   const room = rooms[S.room];
-  names.forEach((n) => room.nodes[n] && (room.nodes[n].visible = v));
   if (S.room === 'exterior') {
     room.lights.lanL.intensity = room.nodes.st_flameL.visible ? 22 : 0;
     room.lights.lanR.intensity = room.nodes.st_flameR.visible ? 22 : 0;
@@ -284,6 +324,7 @@ const bubbles = [];
 async function say(who, text) {
   const a = actors[who], k = KIDS[who];
   if (S.skipping) return;
+  if (!a.root.visible) return voice(`${k.name} (pelo tubo)`, k.color, text); // quem esta do outro lado so se ouve
   const b = el('div', 'bubble', `<span class="who">${k.name}</span>${text}`);
   b.style.color = k.color;
   $('bubbles').append(b);
@@ -377,7 +418,7 @@ const ui = {};
 function buildPanel() {
   const party = $('party');
   party.innerHTML = '';
-  content.party.forEach((k, i) => {
+  content.party.filter((k) => S.team.includes(k.id)).forEach((k, i) => {
     const d = el('button', 'kid' + (S.active === k.id ? ' active' : ''));
     d.style.setProperty('--c', k.color);
     d.append(portraitCanvas(k.id, 96));
@@ -438,8 +479,13 @@ function sentence() {
 function setVerb(v) { if (S.busy) return; sfx('click'); S.verb = S.verb === v ? null : v; S.item = null; buildPanel(); }
 function setActive(id) {
   if (S.busy || S.active === id) return;
-  S.active = id; S.verb = null; S.item = null;
+  activate(id);
   sfx('click'); buildPanel();
+}
+// torna a crianca ativa e mostra a sala onde ela esta (equipe dividida em dois lados)
+function activate(id) {
+  S.active = id; S.verb = null; S.item = null;
+  if (S.loc[id] && S.loc[id] !== S.room) showRoom(S.loc[id]);
 }
 function setHover(h) {
   if (S.hover?.type === h?.type && S.hover?.id === h?.id) return;
@@ -461,13 +507,14 @@ function test(conds = []) {
     const c = c0.replace('$a', S.active), neg = c[0] === '!', f = neg ? c.slice(1) : c;
     let v;
     if (f.startsWith('has:')) v = S.inv.includes(f.slice(4));
+    else if (f.startsWith('team:')) v = S.team.includes(f.slice(5));
     else if (f === 'low') v = S.hp[S.active] <= 1;
     else v = S.flags.has(f);
     return neg ? !v : v;
   });
 }
 function findRule(rules, verb, item) {
-  return (rules || []).find((r) => r.v === verb && (!r.who || r.who === S.active) && (verb !== 'item' || r.item === item) && test(r.if));
+  return (rules || []).find((r) => r.v === verb && (!r.who || [].concat(r.who).includes(S.active)) && (verb !== 'item' || r.item === item) && test(r.if));
 }
 const fill = (text, vars) => (vars ? text.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? '') : text);
 
@@ -496,6 +543,8 @@ async function run(effects, vars) {
       case 'camreset': await camReset(a); break;
       case 'obj': setObjective(a); if (!S.skipping) toast('Novo objetivo'); break;
       case 'room': enterRoom(a); break;
+      case 'view': showRoom(a); break;
+      case 'goto': placeKid(who, b); if (S.active === who) showRoom(b); break;
       case 'place': actors[who].place(b, c, e[4]); break;
       case 'walk': await actors[who].walkTo(b, c); break;
       case 'd20': await rollD20(a, b); break;
@@ -511,12 +560,38 @@ async function run(effects, vars) {
 function changeHp(who, d) {
   const max = KIDS[who].hp;
   S.hp[who] = Math.max(1, Math.min(max, S.hp[who] + d));
+  if (d > 0 && S.hp[who] >= max) S.flags.delete('hurt_' + who); // so deixa de estar machucado com PV cheios
   if (d < 0) { S.flags.add('hurt_' + who); if (!S.skipping) { sfx('hurt'); actors[who].play('hurt', 0.7); flash('#a01020', 450); } }
-  else { S.flags.delete('hurt_' + who); }
   buildPanel();
 }
+function teamUI() {
+  const cfg = content.ui.team;
+  return new Promise((res) => {
+    const o = overlay(`<div class="mini"><h3>${cfg.title}</h3><p>${cfg.text}</p><div class="team"></div><button class="cancel go" disabled>${cfg.go}</button></div>`);
+    const chosen = [], go = o.querySelector('.go');
+    cfg.pool.forEach((id) => {
+      const k = KIDS[id], b = el('button', 'pick', `${k.icon}<small>${k.name}</small>`);
+      b.dataset.kid = id;
+      b.onclick = () => {
+        const i = chosen.indexOf(id);
+        if (i >= 0) chosen.splice(i, 1); else if (chosen.length < cfg.size) chosen.push(id);
+        o.querySelectorAll('.pick').forEach((x) => x.classList.toggle('on', chosen.includes(x.dataset.kid)));
+        go.disabled = chosen.length !== cfg.size; sfx('click');
+      };
+      o.querySelector('.team').append(b);
+    });
+    go.onclick = () => { closeOverlay(); res(chosen.slice()); };
+    ui.team = (ids) => { ids.forEach((id) => o.querySelector(`[data-kid=${id}]`).click()); go.click(); };
+  });
+}
 async function runUI(kind) {
-  if (kind === 'melody') {
+  if (kind === 'team') {
+    const picked = await teamUI(), cfg = content.ui.team;
+    S.team = [...cfg.fixed, ...picked];
+    S.active = cfg.fixed[0];
+    enterRoom(cfg.room);
+    buildPanel();
+  } else if (kind === 'melody') {
     const ok = await melodyUI();
     if (ok === null) return;
     sfx(ok ? 'ok' : 'fail');
@@ -576,6 +651,11 @@ async function interact(hid, verbOverride) {
 async function clickKid(id, fromBar) {
   if (S.busy) return;
   const verb = S.item ? 'item' : S.verb, k = KIDS[id], st = content.strings;
+  if (verb === 'ability' && S.active === 'bia' && S.loc[id] !== S.loc.bia) {
+    S.busy = true;
+    try { await say('bia', st.heal_far || 'Longe demais pra isso.'); } finally { S.busy = false; S.verb = null; buildPanel(); }
+    return;
+  }
   if (verb === 'ability' && S.active === 'bia') {
     S.busy = true;
     try {
@@ -604,6 +684,7 @@ function clickItem(id) {
   if (S.busy) return;
   const it = content.items[id];
   if (S.verb === 'look' || S.verb === 'ability') return doRules(it.rules, S.verb, null, 'item');
+  if (it.auto && !S.verb) return doRules(it.rules, 'use', null, 'item'); // curativo etc.: clicar ja usa
   sfx('click');
   S.item = S.item === id ? null : id; S.verb = null;
   buildPanel();
@@ -728,10 +809,10 @@ addEventListener('keydown', (ev) => {
   if (k === ' ' || k === '.' || k === 'enter') { ev.preventDefault(); return advance?.(); }
   if (k === 'm') return toast(toggleMute() ? 'Som desligado' : 'Som ligado');
   if (S.busy) return;
-  if (k >= '1' && k <= '6') setActive(content.party[+k - 1].id);
+  if (k >= '1' && k <= '6') { const t = content.party.filter((p) => S.team.includes(p.id))[+k - 1]; if (t) setActive(t.id); }
   const vi = 'qwert'.indexOf(k);
   if (vi >= 0) setVerb(vi === 4 ? 'ability' : VERBS[vi][0]);
-  if (k === 'h') { const others = content.party.filter((p) => p.id !== S.active); clickKid(others[Math.floor(Math.random() * others.length)].id, false); }
+  if (k === 'h') { const others = content.party.filter((p) => p.id !== S.active && S.team.includes(p.id)); clickKid(others[Math.floor(Math.random() * others.length)].id, false); }
 });
 $('hintbtn').onclick = () => dispatchEvent(new KeyboardEvent('keydown', { key: 'h' }));
 $('mutebtn').onclick = () => toast(toggleMute() ? 'Som desligado' : 'Som ligado');
@@ -785,8 +866,9 @@ function endChapter() {
   S.ended = true; S.busy = true;
   document.body.classList.remove('cut');
   const m = $('menu');
-  m.querySelector('.sub').textContent = 'Fim do Capítulo 1: O Limiar';
-  m.querySelector('.blurb').innerHTML = 'Uma porta aberta. Cinco lacradas. Alguma coisa de seis patas no porão.<br><b>Capítulo 2, A Vez do Ladino</b>, em produção.';
+  const end = content.meta.end;
+  m.querySelector('.sub').textContent = end?.sub || 'Fim do Capítulo 1: O Limiar';
+  m.querySelector('.blurb').innerHTML = end?.blurb || 'Uma porta aberta. Cinco lacradas. Alguma coisa de seis patas no porão.<br><b>Capítulo 2, A Vez do Ladino</b>, em produção.';
   m.querySelector('#start').textContent = 'Jogar de novo';
   m.querySelector('#start').onclick = () => location.reload();
   m.classList.add('on');
@@ -797,7 +879,8 @@ async function boot() {
   const load = import.meta.env.VITE_ASSETS === 'json'
     ? async (f) => { const { b64 } = await (await fetch(base + f + '.json')).json(); return loader.parseAsync(Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)).buffer, ''); }
     : (f) => loader.loadAsync(base + f);
-  const files = [...content.party.map((k) => `kid_${k.id}.glb`), ...Object.values(content.rooms).map((r) => r.asset)];
+  const roomIds = Object.keys(content.rooms), withAsset = roomIds.filter((id) => content.rooms[id].asset);
+  const files = [...content.party.map((k) => `kid_${k.id}.glb`), ...withAsset.map((id) => content.rooms[id].asset)];
   let done = 0;
   const res = await Promise.all(files.map((f) => load(f).then((g) => { $('loading').textContent = `Carregando… ${Math.round((++done / files.length) * 100)}%`; return g; })));
   content.party.forEach((k, i) => {
@@ -805,10 +888,11 @@ async function boot() {
     a.root.userData.kid = k.id;
     scene.add(a.root);
   });
-  Object.keys(content.rooms).forEach((id, i) => setupRoom(id, res[content.party.length + i]));
+  roomIds.forEach((id) => setupRoom(id, withAsset.includes(id) ? res[content.party.length + withAsset.indexOf(id)] : null));
   content.start.items.forEach((i) => S.inv.push(i));
-  enterRoom('exterior');
-  cam.pos.set(-7, 10, 19); cam.look.set(-1, 6, -10); cam.free = true;
+  enterRoom(content.start.room || 'exterior');
+  if (content.meta.chapter !== 1) { $('menu').querySelector('.sub').textContent = `Capítulo ${content.meta.chapter}: ${content.meta.chapterTitle}`; document.title = `Noite Crítica — Capítulo ${content.meta.chapter}: ${content.meta.chapterTitle}`; }
+  if (content.start.room) camReset(0); else { cam.pos.set(-7, 10, 19); cam.look.set(-1, 6, -10); cam.free = true; }
   buildPanel();
   frame();
   $('loading').style.display = 'none';
@@ -826,9 +910,10 @@ async function boot() {
     cam: camera, run, fx, enterRoom,
     S, content, rooms, actors, ui, skip: skipCutscene, interact,
     idle: () => !S.busy && !advance && !tweens.length,
-    async act(hid, verb, who, item) { if (who) S.active = who; S.verb = null; S.item = item || null; buildPanel(); await interact(hid, item ? 'item' : verb); },
-    async item(id, verb, who) { if (who) S.active = who; await doRules(content.items[id].rules, verb, null, 'item'); },
-    async heal(target) { S.active = 'bia'; S.verb = 'ability'; await clickKid(target, false); },
+    async act(hid, verb, who, item) { if (who) activate(who); S.verb = null; S.item = item || null; buildPanel(); await interact(hid, item ? 'item' : verb); },
+    async item(id, verb, who) { if (who) activate(who); await doRules(content.items[id].rules, verb, null, 'item'); },
+    async useItem(id, who) { if (who) activate(who); S.verb = null; buildPanel(); await clickItem(id); },
+    async heal(target) { activate('bia'); S.verb = 'ability'; await clickKid(target, false); },
     next: () => advance?.(),
   };
 }

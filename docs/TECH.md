@@ -68,7 +68,8 @@ coordenadas no JSON são `[x, z]` no chão, em metros, já no espaço glTF (o Un
 A lista é percorrida em ordem; vale a **primeira** que casa. Sem regra, cai em `strings.defaults`.
 
 - Verbos: `look`, `take`, `use`, `talk`, `ability` (o verbo de classe da criança ativa), `item`.
-- Condições: `"flag"`, `"!flag"`, `"has:item"`, `"low"` (ativo com 1 PV). `$a` = criança ativa.
+- Condições: `"flag"`, `"!flag"`, `"has:item"`, `"team:kid"` (está na equipe do capítulo), `"low"` (ativo com 1 PV). `$a` = criança ativa.
+- `who` aceita uma criança ou uma lista (`["leo", "nina"]`). Um item com `"auto": true` é usado ao clicar nele (regra `use`).
 - `proto` + `kid`: hotspots repetidos (6 portas, 6 retratos) compartilham regras com `{name}`,
   `{cls}`, `{ini}`, `{emb}` preenchidos a partir da ficha.
 
@@ -87,8 +88,25 @@ A lista é percorrida em ordem; vale a **primeira** que casa. Sem regra, cai em 
 | `anim` | quem, gesto | `cast`, `use`, `push`, `play`, `hurt`, `cheer` |
 | `cam`, `camreset` | pos, alvo, seg / seg | Câmera de cutscene |
 | `d20` | caminho, seg | Rola o Dado de Osso por um caminho |
-| `wait`, `obj`, `room`, `walk`, `place` | ... | Utilitários |
-| `if`, `call`, `cutscene`, `ui`, `end` | ... | Fluxo |
+| `wait`, `obj`, `room`, `walk`, `place` | ... | Utilitários (`room` leva a equipe toda para a sala e mostra) |
+| `goto` | quem, sala | Move uma criança para outra sala; mostra a sala se ela for a ativa (cap. 2, dois lados) |
+| `view` | sala | Só troca o cenário mostrado, sem mover ninguém |
+| `if`, `call`, `cutscene`, `ui`, `end` | ... | Fluxo (`ui` aceita `melody`, `clock` e `team`) |
+
+`show`/`hide` aceitam `"sala:no"` para mexer num nó de outra sala (o hall levanta a grade do porão).
+
+### Capítulo 2: dois lados, sem arte
+
+- `?ch=2` carrega `content/chapter2.json`. As **flags e o inventário são globais**, então o tubo é só uma flag
+  (`tube_open`, `order_known`...) e o monta-carga é um item que muda de lado (`give`/`take`).
+- `S.team` é a equipe escolhida (`ui.team`: `fixed` + `size` entre `pool`); `S.loc[kid]` é a sala de cada criança.
+  Só o lado do jogador ativo é mostrado; trocar de criança na barra troca de sala. Quem fala do outro lado
+  aparece como voz `(pelo tubo)`.
+- Sala sem GLB: `rooms.<id>.blockout` = `[nome, [x,y,z], [w,h,d], cor]`, com os mesmos `hs_`/`st_`/`glow_` do Blender.
+  Serve de protótipo até a arte existir; um `asset` GLB passa a valer quando for gerado.
+- `spawn` pode ser por criança (`{"caio": [x,z,graus], "default": ...}`) além da lista indexada do capítulo 1.
+- **O intérprete C# do Unity não conhece** `goto`, `view`, `ui team`, `team:`, `who` em lista, `auto` e `sala:no`.
+  Portar antes de usar o capítulo 2 no Unity.
 
 ## 5. Build web (`src/`)
 
@@ -116,7 +134,8 @@ npm run dev        # http://localhost:5173
 npm run build      # gera dist/
 npm run assets     # regenera os GLB (precisa de: pip install bpy)
 npm run preview -- --port 4173   # e, em outro terminal:
-npm test           # joga o capítulo inteiro num Chromium headless e grava capturas
+npm test           # joga o capítulo 1 inteiro num Chromium headless e grava capturas
+npm run test:ch2   # joga o capítulo 2 com as 10 duplas de apoio (PAIR=nina,iris para uma só)
 ```
 
 ## 6. Unity (`unity/`)

@@ -148,7 +148,9 @@ flowchart TD
 
 # Capítulo 2 — "A Vez do Ladino" (design, ainda não implementado)
 
-> Status: **pré-produção**. Nada aqui está em `content/chapter2.json` nem no Blender.
+> Status: **protótipo jogável sem arte** em `content/chapter2.json` (`?ch=2`), com salas em blockout. Sem Blender e sem cutscenes de autor ainda.
+> `npm run test:ch2` joga as 10 duplas; todas terminam, e os caminhos do Caio batem com a tabela de cobertura abaixo.
+> Diferença do desenho: o monta-carga ainda **não** limita a um item por vez (a placa diz, o motor não impede).
 > Decisões do diretor (GDD §11): equipe de **3 de 6** por capítulo; PT-BR primeiro; tudo grátis por ora.
 
 ## Premissa e regra do capítulo

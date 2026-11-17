@@ -97,10 +97,14 @@ npm run build && npx vite preview --port 4173
 ```
 
 ```bash
-npm test
+npm test            # capítulo 1 inteiro
+npm run test:ch2    # capítulo 2 (protótipo), as 10 duplas
 ```
 
-(`npm test` precisa do preview rodando em outro terminal e do Playwright instalado.)
+(Os testes precisam do preview rodando em outro terminal; `npm install` já traz o Playwright, mas o
+Chromium vem de `npx playwright install chromium`. Em máquina carregada use `FX=0 npm test`.)
+
+O protótipo do **Capítulo 2** abre em `/?ch=2` (local ou na Vercel).
 
 ## Publicar (Vercel)
 
@@ -122,7 +126,7 @@ ambiente). Cada push em `main` publica depois de `vercel git connect` (ou da int
 1. **M1 — Unity de pé**: abrir o scaffold no Unity 6, implementar `IGameServices`, jogar o cap. 1.
 2. **Save** na build web; **toque** para mobile.
 3. **M2 — Passe de arte**: modelagem manual sobre o blockout, rig e clips.
-4. **M3 — Capítulo 2, "A Vez do Ladino"**: o porão, mecânica de dois lados.
+4. **M3 — Capítulo 2, "A Vez do Ladino"**: o porão, mecânica de dois lados. **Protótipo sem arte jogável** (`/?ch=2`); faltam arte (Blender), cutscenes de autor, limite do monta-carga e porte para o Unity.
 5. Infra de produto: Supabase (saves/contas), Stripe (capítulos), EN.
 
 Plano completo, backlog e riscos em [`docs/PRODUCAO.md`](docs/PRODUCAO.md).
@@ -136,6 +140,9 @@ Plano completo, backlog e riscos em [`docs/PRODUCAO.md`](docs/PRODUCAO.md).
 
 ## Registro de mudanças
 
+- **v0.2.0-proto** — Protótipo do Capítulo 2: equipe de 3 de 6 (Caio + 2 apoios), duas salas ativas (hall do
+  tubo e porão), tubo e monta-carga, 4 salas em blockout, `test:ch2` com as 10 duplas. O motor passou a aceitar
+  `?ch=2`, `goto`/`view`/`ui team`, `team:` e `who` em lista. Capítulo 1 inalterado (testes passam).
 - **v0.1.0** — Fatia vertical do Capítulo 1: 3 cutscenes, 2 salas, 6 classes, 2 minijogos (senha
   cantada, relógio da iniciativa), sistema de PV/cura, dicas contextuais, pipeline Blender,
   scaffold Unity, documentação de produção.

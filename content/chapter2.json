@@ -1,0 +1,2744 @@
+{
+ "meta": {
+  "title": "Noite Crítica",
+  "chapter": 2,
+  "chapterTitle": "A Vez do Ladino",
+  "version": "0.2.0-proto",
+  "schema": "Fonte única de verdade do capítulo. Lida pela build web (src/) e pelo intérprete Unity (unity/Assets/Scripts). Coordenadas em metros, eixo Y para cima, [x, z] no chão. Efeitos são tuplas [op, ...args]; ver docs/TECH.md.",
+  "end": {
+   "sub": "Fim do Capítulo 2: A Vez do Ladino (protótipo)",
+   "blurb": "A primeira badalada soou. A porta da flecha acorda.<br><b>Capítulo 3, A Vez da Patrulheira</b>, em produção."
+  }
+ },
+ "start": {
+  "cutscene": "intro",
+  "active": "caio",
+  "room": "hall_tubo",
+  "items": [
+   "doces"
+  ]
+ },
+ "party": [
+  {
+   "id": "bia",
+   "name": "Bia",
+   "cls": "Curandeira",
+   "verb": "Curar",
+   "icon": "✚",
+   "color": "#ff9aa2",
+   "ini": 8,
+   "hp": 3,
+   "emb": "uma cruz"
+  },
+  {
+   "id": "caio",
+   "name": "Caio",
+   "cls": "Ladino",
+   "verb": "Gazua",
+   "icon": "🗝",
+   "color": "#aab4d8",
+   "ini": 19,
+   "hp": 3,
+   "emb": "uma chave"
+  },
+  {
+   "id": "tomas",
+   "name": "Tomás",
+   "cls": "Cavaleiro",
+   "verb": "Força",
+   "icon": "⚔",
+   "color": "#7fb4ff",
+   "ini": 3,
+   "hp": 3,
+   "emb": "uma espada"
+  },
+  {
+   "id": "iris",
+   "name": "Íris",
+   "cls": "Maga",
+   "verb": "Magia",
+   "icon": "★",
+   "color": "#c79bff",
+   "ini": 14,
+   "hp": 3,
+   "emb": "uma estrela"
+  },
+  {
+   "id": "leo",
+   "name": "Leo",
+   "cls": "Bardo",
+   "verb": "Tocar",
+   "icon": "♪",
+   "color": "#ffcf5c",
+   "ini": 11,
+   "hp": 3,
+   "emb": "uma nota musical"
+  },
+  {
+   "id": "nina",
+   "name": "Nina",
+   "cls": "Patrulheira",
+   "verb": "Rastrear",
+   "icon": "➶",
+   "color": "#8fe08a",
+   "ini": 16,
+   "hp": 3,
+   "emb": "uma flecha"
+  }
+ ],
+ "items": {
+  "doces": {
+   "name": "saco de doces",
+   "icon": "🍬",
+   "rules": [
+    {
+     "v": "look",
+     "do": [
+      [
+       "say",
+       "$a",
+       "O saque da noite: chiclete, pirulito e um monte de bala de menta embrulhada em papel-alumínio. Brilha mais que a lua."
+      ]
+     ]
+    }
+   ]
+  },
+  "curativo": {
+   "name": "curativo da Bia",
+   "icon": "🩹",
+   "auto": true,
+   "rules": [
+    {
+     "v": "look",
+     "do": [
+      [
+       "say",
+       "$a",
+       "Gaze, esparadrapo e um adesivo de abóbora. Tem a letra da Bia."
+      ]
+     ]
+    },
+    {
+     "v": "use",
+     "do": [
+      [
+       "if",
+       [
+        "hurt_caio"
+       ],
+       [
+        [
+         "take",
+         "curativo"
+        ],
+        [
+         "sfx",
+         "heal"
+        ],
+        [
+         "hp",
+         "caio",
+         1
+        ],
+        [
+         "say",
+         "caio",
+         "Curativo de abóbora. Dói menos. Valeu, Bia."
+        ]
+       ],
+       [
+        [
+         "say",
+         "caio",
+         "Tô inteiro. Guardo esse pra depois."
+        ]
+       ]
+      ]
+     ]
+    }
+   ]
+  },
+  "sino": {
+   "name": "sino de ouro",
+   "icon": "🔔",
+   "rules": [
+    {
+     "v": "look",
+     "do": [
+      [
+       "say",
+       "$a",
+       "O sino da primeira badalada. Pesa mais do que parece."
+      ]
+     ]
+    }
+   ]
+  }
+ },
+ "macros": {
+  "grate_up": [
+   [
+    "hide",
+    "adega:st_grate_down"
+   ],
+   [
+    "show",
+    "adega:st_grate_up"
+   ],
+   [
+    "set",
+    "grate_up"
+   ],
+   [
+    "sfx",
+    "stone"
+   ],
+   [
+    "fx",
+    "shake"
+   ],
+   [
+    "mestre",
+    "Teste de Força contra a Grade: sucesso."
+   ]
+  ],
+  "collar_ok": [
+   [
+    "anim",
+    "caio",
+    "use"
+   ],
+   [
+    "sfx",
+    "unlock"
+   ],
+   [
+    "say",
+    "caio",
+    "Fechadura de verdade. A única coisa honesta dessa casa."
+   ],
+   [
+    "mestre",
+    "Teste de Ladinagem: sucesso. A primeira das treze badaladas é sua."
+   ],
+   [
+    "hide",
+    "caldeira:st_bell_on_collar"
+   ],
+   [
+    "give",
+    "sino"
+   ],
+   [
+    "set",
+    "got_bell"
+   ],
+   [
+    "obj",
+    "Mande o sino pelo monta-carga até o hall."
+   ]
+  ],
+  "rest": [
+   [
+    "sfx",
+    "heal"
+   ],
+   [
+    "hp",
+    "caio",
+    3
+   ],
+   [
+    "say",
+    "caio",
+    "Sentei, respirei, contei os dedos. Novo em folha."
+   ]
+  ]
+ },
+ "strings": {
+  "heal": [
+   "Curativo, sopro e beijinho de mentira. Novo em folha.",
+   "Cura: PV restaurados."
+  ],
+  "heal_none": "Tá inteiro. Eu não gasto esparadrapo à toa.",
+  "kid_look": "É {name}, {cls} da mesa. Iniciativa {ini}.",
+  "defaults": {
+   "look": [
+    "Nada de especial.",
+    "Parece normal. O que, nessa casa, já é suspeito."
+   ],
+   "take": [
+    "Não dá pra levar isso.",
+    "Minha mochila já tá cheia de doce."
+   ],
+   "use": [
+    "Não sei o que fazer com isso.",
+    "Isso não funciona assim."
+   ],
+   "talk": [
+    "Não respondeu. Ainda bem.",
+    "Conversar com isso? Ainda não cheguei nesse ponto."
+   ],
+   "item": [
+    "Isso não combina com aquilo.",
+    "Não vai dar certo."
+   ],
+   "ability": {
+    "bia": "Isso não se cura com curativo.",
+    "caio": "Não tem fechadura aí.",
+    "tomas": "Força bruta não resolve isso. Infelizmente.",
+    "iris": "Não tem runa nem pavio aí.",
+    "leo": "Toquei um acorde. Nada aconteceu. Público difícil.",
+    "nina": "Sem rastro, sem bicho. Nada pra seguir aqui."
+   }
+  },
+  "heal_far": "Longe demais. Mando um curativo pelo monta-carga."
+ },
+ "ui": {
+  "team": {
+   "title": "Quem ajuda o Caio?",
+   "text": "Ele desce sozinho. Escolha 2 amigos para ficar no hall e ajudar pelo tubo.",
+   "fixed": [
+    "caio"
+   ],
+   "pool": [
+    "bia",
+    "tomas",
+    "iris",
+    "leo",
+    "nina"
+   ],
+   "size": 2,
+   "room": "hall_tubo",
+   "go": "Descer"
+  }
+ },
+ "rooms": {
+  "hall_tubo": {
+   "name": "Hall do Tubo",
+   "music": "dungeon",
+   "floor": "#2b2236",
+   "wall": "#1d1830",
+   "camera": {
+    "pos": [
+     0,
+     5.4,
+     12
+    ],
+    "look": [
+     0,
+     1.8,
+     -4
+    ],
+    "fov": 46
+   },
+   "walk": {
+    "minX": -7,
+    "maxX": 7,
+    "minZ": -5.6,
+    "maxZ": 1.6,
+    "blockers": []
+   },
+   "spawn": {
+    "bia": [
+     -4.2,
+     0.4,
+     180
+    ],
+    "tomas": [
+     -1.4,
+     0.8,
+     180
+    ],
+    "iris": [
+     1.4,
+     0.6,
+     180
+    ],
+    "leo": [
+     3.4,
+     0.8,
+     180
+    ],
+    "nina": [
+     -2.8,
+     -0.6,
+     180
+    ],
+    "caio": [
+     0,
+     0.6,
+     180
+    ],
+    "default": [
+     0,
+     0.5,
+     180
+    ]
+   },
+   "blockout": [
+    [
+     "hs_tube",
+     [
+      -5.8,
+      1.3,
+      -5.0
+     ],
+     [
+      0.5,
+      2.6,
+      0.5
+     ],
+     "#a8743a"
+    ],
+    [
+     "hs_runewall",
+     [
+      -3.0,
+      1.9,
+      -5.9
+     ],
+     [
+      2.4,
+      2.4,
+      0.3
+     ],
+     "#4a3a7a"
+    ],
+    [
+     "hs_clock",
+     [
+      0,
+      2.7,
+      -6.0
+     ],
+     [
+      1.5,
+      1.5,
+      0.4
+     ],
+     "#c9a54a"
+    ],
+    [
+     "hs_horn",
+     [
+      3.0,
+      1.1,
+      -5.2
+     ],
+     [
+      0.9,
+      1.7,
+      0.9
+     ],
+     "#7a8f9a"
+    ],
+    [
+     "hs_winch",
+     [
+      5.9,
+      1.0,
+      -4.6
+     ],
+     [
+      1.2,
+      2.0,
+      1.2
+     ],
+     "#6b4a2a"
+    ],
+    [
+     "hs_cart_up",
+     [
+      6.2,
+      1.0,
+      -1.4
+     ],
+     [
+      1.0,
+      2.0,
+      1.0
+     ],
+     "#8a6a3a"
+    ],
+    [
+     "hs_medkit",
+     [
+      -6.1,
+      0.7,
+      -2.2
+     ],
+     [
+      1.0,
+      1.4,
+      1.0
+     ],
+     "#d8d8d8"
+    ],
+    [
+     "hs_mosaic",
+     [
+      0,
+      0.03,
+      -1.3
+     ],
+     [
+      4.2,
+      0.06,
+      2.4
+     ],
+     "#7a3cff"
+    ]
+   ],
+   "hints": [
+    {
+     "if": [
+      "!tube_open"
+     ],
+     "text": "O Caio desceu sozinho. Quando ele abrir o bocal, o tubo fala. Dá pra ouvir um arranhão lá embaixo."
+    },
+    {
+     "if": [
+      "!grate_up"
+     ],
+     "text": "A grade do porão é pesada. Tem uma manivela aqui no hall, e a Nina lê rastro no mosaico."
+    },
+    {
+     "if": [
+      "!order_known"
+     ],
+     "text": "Os barris pesam diferente. A parede de runas ou o chifre sonoro devem saber a ordem."
+    },
+    {
+     "if": [
+      "!dog_asleep",
+      "!dog_window"
+     ],
+     "text": "O cão de caldeira é de ritmo e de canção. Fale com ele pelo tubo."
+    },
+    {
+     "if": [
+      "!got_bell"
+     ],
+     "text": "A coleira do cão tem fechadura. Isso é com o Caio."
+    },
+    {
+     "if": [
+      "!bell_arrived"
+     ],
+     "text": "O sino vai subir pelo monta-carga, no canto."
+    },
+    {
+     "if": [],
+     "text": "O sino vai no relógio. A primeira badalada."
+    }
+   ],
+   "hotspots": {
+    "tube": {
+     "name": "boca do tubo",
+     "at": [
+      -5.0,
+      -3.8
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Uma boca de latão na parede. Dela vem um arranhão de unhas no chão, bem longe."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "if": [
+        "!tube_open"
+       ],
+       "who": [
+        "leo",
+        "nina"
+       ],
+       "do": [
+        [
+         "say",
+         "$a",
+         "O tubo tá mudo. Alguém lá embaixo precisa abrir o bocal primeiro."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "leo",
+       "if": [
+        "!dog_asleep"
+       ],
+       "do": [
+        [
+         "anim",
+         "leo",
+         "play"
+        ],
+        [
+         "sfx",
+         "note0"
+        ],
+        [
+         "say",
+         "leo",
+         "Cantiga de ninar do meu avô, em quatro notas. Desce com o vento."
+        ],
+        [
+         "set",
+         "dog_asleep"
+        ],
+        [
+         "mestre",
+         "Teste de Carisma: sucesso. O cão boceja."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "leo",
+       "if": [
+        "dog_asleep"
+       ],
+       "do": [
+        [
+         "say",
+         "leo",
+         "O cão já dorme. Não acorda ele, Leo."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "nina",
+       "if": [
+        "!dog_window"
+       ],
+       "do": [
+        [
+         "say",
+         "nina",
+         "As patas batem três vezes e param. Três vezes e param. Caio: na pausa, você passa."
+        ],
+        [
+         "set",
+         "dog_window"
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "nina",
+       "if": [
+        "dog_window"
+       ],
+       "do": [
+        [
+         "say",
+         "nina",
+         "Já falei o ritmo. Três e pausa."
+        ]
+       ]
+      },
+      {
+       "v": "talk",
+       "if": [
+        "tube_open"
+       ],
+       "do": [
+        [
+         "say",
+         "$a",
+         "Caio? Tá me ouvindo?"
+        ]
+       ]
+      },
+      {
+       "v": "talk",
+       "do": [
+        [
+         "say",
+         "$a",
+         "O tubo tá mudo. Alguém lá embaixo precisa abrir o bocal primeiro."
+        ]
+       ]
+      }
+     ]
+    },
+    "runewall": {
+     "name": "parede de runas",
+     "at": [
+      -3.0,
+      -4.6
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Runas em fileira, ao lado de quatro desenhos: uma pena, uma folha, uma pedra e um bloco."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "if": [
+        "!tube_open"
+       ],
+       "who": "iris",
+       "do": [
+        [
+         "say",
+         "$a",
+         "O tubo tá mudo. Alguém lá embaixo precisa abrir o bocal primeiro."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "iris",
+       "do": [
+        [
+         "anim",
+         "iris",
+         "cast"
+        ],
+        [
+         "set",
+         "order_known"
+        ],
+        [
+         "read",
+         "Tabela de Pesos",
+         "OS BARRIS SE ABREM\nDO MAIS LEVE AO MAIS PESADO:\n\n  PENA  <  FOLHA  <  PEDRA  <  CHUMBO"
+        ],
+        [
+         "say",
+         "iris",
+         "Caio! Pena, folha, pedra, chumbo. Nessa ordem."
+        ]
+       ]
+      }
+     ]
+    },
+    "horn": {
+     "name": "chifre sonoro",
+     "at": [
+      3.0,
+      -4.2
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Um chifre de latão ligado a um cano que desce. Ouve o porão."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "if": [
+        "!tube_open"
+       ],
+       "who": "leo",
+       "do": [
+        [
+         "say",
+         "$a",
+         "O tubo tá mudo. Alguém lá embaixo precisa abrir o bocal primeiro."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "leo",
+       "do": [
+        [
+         "anim",
+         "leo",
+         "play"
+        ],
+        [
+         "set",
+         "order_known"
+        ],
+        [
+         "say",
+         "leo",
+         "Dá pra ouvir o timbre. Do agudo ao grave: pena, folha, pedra, chumbo. Caio, bate nos barris nessa ordem."
+        ]
+       ]
+      }
+     ]
+    },
+    "winch": {
+     "name": "manivela",
+     "at": [
+      4.8,
+      -3.4
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Uma manivela grossa. A corrente dela some pelo chão, rumo ao porão."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "tomas",
+       "if": [
+        "grate_up"
+       ],
+       "do": [
+        [
+         "say",
+         "tomas",
+         "A grade já subiu. Bom trabalho, eu."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "tomas",
+       "do": [
+        [
+         "anim",
+         "tomas",
+         "push"
+        ],
+        [
+         "say",
+         "tomas",
+         "Isso é serviço pra cavaleiro. Segura aí, Caio!"
+        ],
+        [
+         "call",
+         "grate_up"
+        ]
+       ]
+      }
+     ]
+    },
+    "mosaic": {
+     "name": "mosaico do chão",
+     "at": [
+      0,
+      -0.4
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Um mosaico roxo gasto. No canto esquerdo, a lajota é mais clara."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "if": [
+        "!tube_open"
+       ],
+       "who": "nina",
+       "do": [
+        [
+         "say",
+         "$a",
+         "O tubo tá mudo. Alguém lá embaixo precisa abrir o bocal primeiro."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "nina",
+       "if": [
+        "latch_known"
+       ],
+       "do": [
+        [
+         "say",
+         "nina",
+         "Marca de arrasto. A mesma que tem aí embaixo, perto da grade. Caio: a pedra solta do canto esquerdo."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "nina",
+       "do": [
+        [
+         "set",
+         "latch_known"
+        ],
+        [
+         "say",
+         "nina",
+         "Marca de arrasto. A mesma que tem aí embaixo, perto da grade. Caio: a pedra solta do canto esquerdo."
+        ]
+       ]
+      }
+     ]
+    },
+    "medkit": {
+     "name": "maleta de curativos",
+     "at": [
+      -5.0,
+      -1.9
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "A maleta da Bia, aberta. Esparadrapo, gaze e uns doces de menta."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "bia",
+       "if": [
+        "kit2"
+       ],
+       "do": [
+        [
+         "say",
+         "bia",
+         "Acabou o esparadrapo bom. O resto é decoração."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "bia",
+       "if": [
+        "kit1"
+       ],
+       "do": [
+        [
+         "set",
+         "kit2"
+        ],
+        [
+         "give",
+         "curativo"
+        ],
+        [
+         "sfx",
+         "pick"
+        ],
+        [
+         "say",
+         "bia",
+         "Curativo número dois. O último, tá? Manda descer."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "bia",
+       "do": [
+        [
+         "set",
+         "kit1"
+        ],
+        [
+         "give",
+         "curativo"
+        ],
+        [
+         "sfx",
+         "pick"
+        ],
+        [
+         "say",
+         "bia",
+         "Curativo pronto. Vai no monta-carga, Caio, é só usar."
+        ]
+       ]
+      }
+     ]
+    },
+    "cart_up": {
+     "name": "monta-carga",
+     "at": [
+      5.2,
+      -1.3
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Um monta-carga de madeira. Placa: SÓ CABE UMA COISA POR VEZ."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "bell_up",
+        "!bell_arrived"
+       ],
+       "do": [
+        [
+         "give",
+         "sino"
+        ],
+        [
+         "set",
+         "bell_arrived"
+        ],
+        [
+         "sfx",
+         "pick"
+        ],
+        [
+         "obj",
+         "Use o sino no relógio do hall."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Nada novo no monta-carga."
+        ]
+       ]
+      }
+     ]
+    },
+    "clock": {
+     "name": "relógio do hall",
+     "at": [
+      0,
+      -4.8
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "O relógio da casa. Falta uma badalada que ele nunca deu."
+        ]
+       ]
+      },
+      {
+       "v": "item",
+       "item": "sino",
+       "do": [
+        [
+         "take",
+         "sino"
+        ],
+        [
+         "cutscene",
+         "ending"
+        ]
+       ]
+      }
+     ]
+    }
+   }
+  },
+  "adega": {
+   "name": "Adega",
+   "music": "dungeon",
+   "floor": "#241c22",
+   "wall": "#181320",
+   "camera": {
+    "pos": [
+     0,
+     5.2,
+     11
+    ],
+    "look": [
+     0,
+     1.6,
+     -4
+    ],
+    "fov": 46
+   },
+   "walk": {
+    "minX": -6,
+    "maxX": 6,
+    "minZ": -5.4,
+    "maxZ": 1.6,
+    "blockers": []
+   },
+   "spawn": {
+    "caio": [
+     0,
+     0.4,
+     180
+    ],
+    "default": [
+     0,
+     0.4,
+     180
+    ]
+   },
+   "blockout": [
+    [
+     "hs_mouthpiece",
+     [
+      -5.0,
+      1.3,
+      -4.5
+     ],
+     [
+      0.5,
+      0.9,
+      0.5
+     ],
+     "#a8743a"
+    ],
+    [
+     "hs_plaque",
+     [
+      4.0,
+      2.2,
+      -5.1
+     ],
+     [
+      1.8,
+      1.0,
+      0.2
+     ],
+     "#c9a3ff"
+    ],
+    [
+     "hs_stone",
+     [
+      -3.4,
+      0.45,
+      -5.0
+     ],
+     [
+      0.9,
+      0.9,
+      0.6
+     ],
+     "#5a5a66"
+    ],
+    [
+     "hs_grate",
+     [
+      0,
+      1.4,
+      -4.6
+     ],
+     [
+      4.2,
+      2.8,
+      0.3
+     ],
+     "#3a3a44"
+    ],
+    [
+     "st_grate_down",
+     [
+      0,
+      1.4,
+      -4.3
+     ],
+     [
+      4.2,
+      2.8,
+      0.3
+     ],
+     "#3a3a44"
+    ],
+    [
+     "st_grate_up",
+     [
+      0,
+      3.2,
+      -4.6
+     ],
+     [
+      4.2,
+      0.5,
+      0.3
+     ],
+     "#3a3a44"
+    ],
+    [
+     "hs_bench",
+     [
+      4.6,
+      0.6,
+      -2.8
+     ],
+     [
+      1.8,
+      1.2,
+      0.9
+     ],
+     "#8a5a3a"
+    ]
+   ],
+   "hide": [
+    "st_grate_up"
+   ],
+   "hints": [
+    {
+     "if": [
+      "!tube_open"
+     ],
+     "text": "Tem um bocal de latão num tubo que sobe. Os outros devem estar do outro lado."
+    },
+    {
+     "if": [
+      "!grate_up"
+     ],
+     "text": "A grade tá caída. Tem uma pedra solta no canto. Peça ajuda pelo tubo antes de arrebentar a corrente."
+    },
+    {
+     "if": [],
+     "text": "Passa pela grade, em direção aos barris."
+    }
+   ],
+   "hotspots": {
+    "mouthpiece": {
+     "name": "bocal do tubo",
+     "at": [
+      -4.2,
+      -3.7
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Um bocal de latão preso num tubo que sobe pela parede."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "tube_open"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "Ainda tem gente do outro lado, né?"
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "do": [
+        [
+         "set",
+         "tube_open"
+        ],
+        [
+         "sfx",
+         "whoosh"
+        ],
+        [
+         "say",
+         "caio",
+         "Alô? …Tô aqui embaixo. Descer sozinho eu desci. Agora eu preciso de vocês."
+        ],
+        [
+         "mestre",
+         "O tubo respira. Do outro lado, vozes conhecidas."
+        ],
+        [
+         "obj",
+         "Descreva o porão pelo tubo e peça ajuda. Tem uma grade, barris e um cão."
+        ]
+       ]
+      },
+      {
+       "v": "talk",
+       "if": [
+        "!tube_open"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "Ainda sem sinal. Tem que usar o bocal."
+        ]
+       ]
+      },
+      {
+       "v": "talk",
+       "do": [
+        [
+         "say",
+         "caio",
+         "Pessoal? Quem me dá uma ideia?"
+        ]
+       ]
+      }
+     ]
+    },
+    "plaque": {
+     "name": "placa do Mestre",
+     "at": [
+      3.6,
+      -4.0
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "read",
+         "Regra do Porão",
+         "NO PORÃO, QUEM DESCE DESCE SÓ.\nA VOZ DESCE JUNTO,\nMAS A MÃO NÃO.\n\nO CÃO GUARDA A PRIMEIRA BADALADA."
+        ]
+       ]
+      }
+     ]
+    },
+    "stone": {
+     "name": "pedra solta",
+     "at": [
+      -3.0,
+      -4.2
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Uma pedra solta. Em volta dela, marcas de arrasto no chão."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "grate_up"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "A grade já subiu."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "latch_known"
+       ],
+       "do": [
+        [
+         "anim",
+         "caio",
+         "use"
+        ],
+        [
+         "say",
+         "caio",
+         "Clique. Era uma trava, não uma pedra."
+        ],
+        [
+         "call",
+         "grate_up"
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "do": [
+        [
+         "say",
+         "caio",
+         "Só uma pedra com risco de unha. Quem sabe ler rastro? Eu não."
+        ]
+       ]
+      }
+     ]
+    },
+    "grate": {
+     "name": "grade",
+     "at": [
+      0,
+      -3.6
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Uma grade de ferro e uma corrente grossa presa num cadeado. Não tem outra passagem."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "grate_up"
+       ],
+       "do": [
+        [
+         "goto",
+         "caio",
+         "barris"
+        ],
+        [
+         "obj",
+         "Os barris escondem o escoadouro. Peça a ordem pelo tubo."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "do": [
+        [
+         "say",
+         "caio",
+         "Fechada. Ninguém passa por baixo."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "caio",
+       "if": [
+        "grate_up"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "A grade já tá no alto. Passa por ela."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "caio",
+       "if": [
+        "low"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "Com 1 PV eu não mexo na corrente. Ela morde. Preciso descansar."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "caio",
+       "do": [
+        [
+         "anim",
+         "caio",
+         "use"
+        ],
+        [
+         "sfx",
+         "unlock"
+        ],
+        [
+         "say",
+         "caio",
+         "Dá pra abrir o cadeado, mas a corrente solta e vem na minha mão."
+        ],
+        [
+         "hp",
+         "caio",
+         -1
+        ],
+        [
+         "call",
+         "grate_up"
+        ]
+       ]
+      }
+     ]
+    },
+    "bench": {
+     "name": "bancada de descanso",
+     "at": [
+      3.6,
+      -2.0
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Uma bancada com uma almofada. Escrito a giz: 'DESCANSO CURTO. UMA VEZ POR SALA.'"
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "rest_adega"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "Descansei aqui nessa sala já. O Mestre cobra o descanso caro."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "do": [
+        [
+         "set",
+         "rest_adega"
+        ],
+        [
+         "call",
+         "rest"
+        ]
+       ]
+      }
+     ]
+    }
+   }
+  },
+  "barris": {
+   "name": "Sala dos Barris",
+   "music": "dungeon",
+   "floor": "#2a2018",
+   "wall": "#1c1418",
+   "camera": {
+    "pos": [
+     0,
+     5.2,
+     11
+    ],
+    "look": [
+     0,
+     1.6,
+     -4
+    ],
+    "fov": 46
+   },
+   "walk": {
+    "minX": -6,
+    "maxX": 6,
+    "minZ": -5.4,
+    "maxZ": 1.6,
+    "blockers": []
+   },
+   "spawn": {
+    "caio": [
+     0,
+     0.6,
+     180
+    ],
+    "default": [
+     0,
+     0.6,
+     180
+    ]
+   },
+   "blockout": [
+    [
+     "hs_barrel_1",
+     [
+      -4.5,
+      0.9,
+      -3.6
+     ],
+     [
+      1.3,
+      1.8,
+      1.3
+     ],
+     "#6b4a2a"
+    ],
+    [
+     "hs_barrel_2",
+     [
+      -1.5,
+      0.9,
+      -3.6
+     ],
+     [
+      1.3,
+      1.8,
+      1.3
+     ],
+     "#6b4a2a"
+    ],
+    [
+     "hs_barrel_3",
+     [
+      1.5,
+      0.9,
+      -3.6
+     ],
+     [
+      1.3,
+      1.8,
+      1.3
+     ],
+     "#6b4a2a"
+    ],
+    [
+     "hs_barrel_4",
+     [
+      4.5,
+      0.9,
+      -3.6
+     ],
+     [
+      1.3,
+      1.8,
+      1.3
+     ],
+     "#6b4a2a"
+    ],
+    [
+     "hs_drain",
+     [
+      0,
+      0.03,
+      -0.8
+     ],
+     [
+      1.8,
+      0.06,
+      1.8
+     ],
+     "#222"
+    ],
+    [
+     "st_drain_shut",
+     [
+      0,
+      0.07,
+      -0.8
+     ],
+     [
+      1.8,
+      0.06,
+      1.8
+     ],
+     "#555"
+    ],
+    [
+     "st_drain_open",
+     [
+      0,
+      0.07,
+      -0.8
+     ],
+     [
+      1.2,
+      0.06,
+      1.2
+     ],
+     "#000"
+    ],
+    [
+     "hs_bench2",
+     [
+      -5.2,
+      0.6,
+      -0.6
+     ],
+     [
+      1.6,
+      1.2,
+      0.9
+     ],
+     "#8a5a3a"
+    ]
+   ],
+   "hide": [
+    "st_drain_open"
+   ],
+   "hints": [
+    {
+     "if": [
+      "!order_known"
+     ],
+     "text": "Quatro barris com desenhos: pena, folha, pedra, chumbo. A Íris lê o que está na parede do hall. O Leo escuta pelo chifre."
+    },
+    {
+     "if": [
+      "!drain_open"
+     ],
+     "text": "Gire os barris do mais leve ao mais pesado. Errar custa vinagre."
+    },
+    {
+     "if": [],
+     "text": "O escoadouro abriu. Desça por ele."
+    }
+   ],
+   "hotspots": {
+    "barrel_1": {
+     "name": "barril 1",
+     "at": [
+      -4.5,
+      -2.4
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Um barril de carvalho com uma folha gravada na tampa."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "s_1"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "Esse já girou."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "!s_1",
+        "s_3"
+       ],
+       "do": [
+        [
+         "sfx",
+         "click"
+        ],
+        [
+         "set",
+         "s_1"
+        ],
+        [
+         "say",
+         "caio",
+         "Girou. Algo fez clique lá dentro."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "low"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "Com 1 PV eu não mexo em barril que cospe vinagre. Preciso descansar."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "do": [
+        [
+         "sfx",
+         "hurt"
+        ],
+        [
+         "hp",
+         "caio",
+         -1
+        ],
+        [
+         "unset",
+         "s_1"
+        ],
+        [
+         "unset",
+         "s_2"
+        ],
+        [
+         "unset",
+         "s_3"
+        ],
+        [
+         "unset",
+         "s_4"
+        ],
+        [
+         "mestre",
+         "Teste de Destreza: falha. Vinagre nos olhos. A sequência recomeça."
+        ]
+       ]
+      }
+     ]
+    },
+    "barrel_2": {
+     "name": "barril 2",
+     "at": [
+      -1.5,
+      -2.4
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Um barril de carvalho com um bloco de chumbo gravada na tampa."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "s_2"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "Esse já girou."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "!s_2",
+        "s_4"
+       ],
+       "do": [
+        [
+         "sfx",
+         "click"
+        ],
+        [
+         "set",
+         "s_2"
+        ],
+        [
+         "say",
+         "caio",
+         "Girou. Algo fez clique lá dentro."
+        ],
+        [
+         "sfx",
+         "stone"
+        ],
+        [
+         "hide",
+         "barris:st_drain_shut"
+        ],
+        [
+         "show",
+         "barris:st_drain_open"
+        ],
+        [
+         "set",
+         "drain_open"
+        ],
+        [
+         "fx",
+         "shake"
+        ],
+        [
+         "mestre",
+         "Teste de Percepção: sucesso. O escoadouro abriu."
+        ],
+        [
+         "obj",
+         "Desça pelo escoadouro."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "low"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "Com 1 PV eu não mexo em barril que cospe vinagre. Preciso descansar."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "do": [
+        [
+         "sfx",
+         "hurt"
+        ],
+        [
+         "hp",
+         "caio",
+         -1
+        ],
+        [
+         "unset",
+         "s_1"
+        ],
+        [
+         "unset",
+         "s_2"
+        ],
+        [
+         "unset",
+         "s_3"
+        ],
+        [
+         "unset",
+         "s_4"
+        ],
+        [
+         "mestre",
+         "Teste de Destreza: falha. Vinagre nos olhos. A sequência recomeça."
+        ]
+       ]
+      }
+     ]
+    },
+    "barrel_3": {
+     "name": "barril 3",
+     "at": [
+      1.5,
+      -2.4
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Um barril de carvalho com uma pena gravada na tampa."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "s_3"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "Esse já girou."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "!s_3"
+       ],
+       "do": [
+        [
+         "sfx",
+         "click"
+        ],
+        [
+         "set",
+         "s_3"
+        ],
+        [
+         "say",
+         "caio",
+         "Girou. Algo fez clique lá dentro."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "low"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "Com 1 PV eu não mexo em barril que cospe vinagre. Preciso descansar."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "do": [
+        [
+         "sfx",
+         "hurt"
+        ],
+        [
+         "hp",
+         "caio",
+         -1
+        ],
+        [
+         "unset",
+         "s_1"
+        ],
+        [
+         "unset",
+         "s_2"
+        ],
+        [
+         "unset",
+         "s_3"
+        ],
+        [
+         "unset",
+         "s_4"
+        ],
+        [
+         "mestre",
+         "Teste de Destreza: falha. Vinagre nos olhos. A sequência recomeça."
+        ]
+       ]
+      }
+     ]
+    },
+    "barrel_4": {
+     "name": "barril 4",
+     "at": [
+      4.5,
+      -2.4
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Um barril de carvalho com uma pedra gravada na tampa."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "s_4"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "Esse já girou."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "!s_4",
+        "s_1"
+       ],
+       "do": [
+        [
+         "sfx",
+         "click"
+        ],
+        [
+         "set",
+         "s_4"
+        ],
+        [
+         "say",
+         "caio",
+         "Girou. Algo fez clique lá dentro."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "low"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "Com 1 PV eu não mexo em barril que cospe vinagre. Preciso descansar."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "do": [
+        [
+         "sfx",
+         "hurt"
+        ],
+        [
+         "hp",
+         "caio",
+         -1
+        ],
+        [
+         "unset",
+         "s_1"
+        ],
+        [
+         "unset",
+         "s_2"
+        ],
+        [
+         "unset",
+         "s_3"
+        ],
+        [
+         "unset",
+         "s_4"
+        ],
+        [
+         "mestre",
+         "Teste de Destreza: falha. Vinagre nos olhos. A sequência recomeça."
+        ]
+       ]
+      }
+     ]
+    },
+    "drain": {
+     "name": "escoadouro",
+     "at": [
+      0,
+      -0.2
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Um ralo grande no chão, com tampa de ferro. Vem calor e cheiro de cão molhado de lá."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "drain_open"
+       ],
+       "do": [
+        [
+         "goto",
+         "caio",
+         "caldeira"
+        ],
+        [
+         "obj",
+         "O cão guarda o sino na coleira. Peça ajuda pelo tubo."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "do": [
+        [
+         "say",
+         "caio",
+         "Lacrado. Os barris mandam aqui."
+        ]
+       ]
+      }
+     ]
+    },
+    "bench2": {
+     "name": "bancada de descanso",
+     "at": [
+      -4.2,
+      -0.4
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Uma bancada com uma almofada. Escrito a giz: 'DESCANSO CURTO. UMA VEZ POR SALA.'"
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "rest_barris"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "Descansei aqui nessa sala já. O Mestre cobra o descanso caro."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "do": [
+        [
+         "set",
+         "rest_barris"
+        ],
+        [
+         "call",
+         "rest"
+        ]
+       ]
+      }
+     ]
+    }
+   }
+  },
+  "caldeira": {
+   "name": "Caldeira",
+   "music": "dungeon",
+   "floor": "#2a1612",
+   "wall": "#1c0f0f",
+   "camera": {
+    "pos": [
+     0,
+     5.2,
+     11
+    ],
+    "look": [
+     0,
+     1.6,
+     -4
+    ],
+    "fov": 46
+   },
+   "walk": {
+    "minX": -6,
+    "maxX": 6,
+    "minZ": -5.4,
+    "maxZ": 1.6,
+    "blockers": []
+   },
+   "spawn": {
+    "caio": [
+     4.0,
+     0.8,
+     180
+    ],
+    "default": [
+     4.0,
+     0.8,
+     180
+    ]
+   },
+   "blockout": [
+    [
+     "glow_furnace",
+     [
+      0,
+      2.2,
+      -5.2
+     ],
+     [
+      3.4,
+      3.2,
+      0.4
+     ],
+     "#ff6a2a"
+    ],
+    [
+     "hs_dog",
+     [
+      -2.0,
+      0.9,
+      -3.4
+     ],
+     [
+      2.6,
+      1.8,
+      1.6
+     ],
+     "#7a2a2a"
+    ],
+    [
+     "hs_collar",
+     [
+      -0.4,
+      1.6,
+      -2.2
+     ],
+     [
+      0.8,
+      0.45,
+      0.5
+     ],
+     "#c9a54a"
+    ],
+    [
+     "st_bell_on_collar",
+     [
+      -0.4,
+      1.2,
+      -2.2
+     ],
+     [
+      0.45,
+      0.6,
+      0.45
+     ],
+     "#e2b93b"
+    ],
+    [
+     "hs_cart_down",
+     [
+      5.2,
+      1.0,
+      -3.6
+     ],
+     [
+      1.2,
+      2.0,
+      1.2
+     ],
+     "#8a6a3a"
+    ],
+    [
+     "hs_bench3",
+     [
+      -5.2,
+      0.6,
+      0.0
+     ],
+     [
+      1.6,
+      1.2,
+      0.9
+     ],
+     "#8a5a3a"
+    ]
+   ],
+   "hints": [
+    {
+     "if": [
+      "!dog_asleep",
+      "!dog_window",
+      "!got_bell"
+     ],
+     "text": "O cão rosna alto. Leo canta e a Nina conta o ritmo das patas. Os doces também funcionam, mas o cão morde."
+    },
+    {
+     "if": [
+      "!got_bell"
+     ],
+     "text": "A coleira tem uma fechadura de verdade. Gazua, Caio."
+    },
+    {
+     "if": [],
+     "text": "O sino vai no monta-carga, no canto da sala."
+    }
+   ],
+   "hotspots": {
+    "dog": {
+     "name": "cão de caldeira",
+     "at": [
+      -0.2,
+      -1.4
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Seis patas, pelo de cinza e uma coleira com um sino de ouro. Acordado, e rosnando baixo."
+        ]
+       ]
+      },
+      {
+       "v": "look",
+       "if": [
+        "dog_asleep"
+       ],
+       "do": [
+        [
+         "say",
+         "$a",
+         "Dormindo, enrolado no próprio rabo. Ronca fogo."
+        ]
+       ]
+      },
+      {
+       "v": "talk",
+       "do": [
+        [
+         "say",
+         "caio",
+         "Bom cachorro? Bom cachorro com seis patas?"
+        ]
+       ]
+      },
+      {
+       "v": "item",
+       "item": "doces",
+       "if": [
+        "dog_asleep"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "Ele já tá ocupado."
+        ]
+       ]
+      },
+      {
+       "v": "item",
+       "item": "doces",
+       "if": [
+        "dog_dist"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "Ele já tá comendo."
+        ]
+       ]
+      },
+      {
+       "v": "item",
+       "item": "doces",
+       "if": [
+        "low"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "Com 1 PV eu não chego perto dos dentes. Preciso descansar."
+        ]
+       ]
+      },
+      {
+       "v": "item",
+       "item": "doces",
+       "do": [
+        [
+         "sfx",
+         "roar"
+        ],
+        [
+         "hp",
+         "caio",
+         -1
+        ],
+        [
+         "set",
+         "dog_dist"
+        ],
+        [
+         "fx",
+         "shake"
+        ],
+        [
+         "say",
+         "caio",
+         "Bala de menta! Ele abocanhou a bala e a minha manga também."
+        ]
+       ]
+      }
+     ]
+    },
+    "collar": {
+     "name": "coleira do cão",
+     "at": [
+      0.6,
+      -1.0
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Uma coleira grossa, com fechadura de verdade. O sino de ouro pendura nela."
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "caio",
+       "if": [
+        "dog_asleep"
+       ],
+       "do": [
+        [
+         "call",
+         "collar_ok"
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "caio",
+       "if": [
+        "dog_window"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "É agora, na pausa das patas…"
+        ],
+        [
+         "call",
+         "collar_ok"
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "caio",
+       "if": [
+        "dog_dist"
+       ],
+       "do": [
+        [
+         "call",
+         "collar_ok"
+        ]
+       ]
+      },
+      {
+       "v": "ability",
+       "who": "caio",
+       "do": [
+        [
+         "sfx",
+         "roar"
+        ],
+        [
+         "say",
+         "caio",
+         "Ele me viu! Recuo. Preciso de um jeito de ele não ligar pra mim."
+        ]
+       ]
+      }
+     ]
+    },
+    "cart_down": {
+     "name": "monta-carga",
+     "at": [
+      4.2,
+      -2.8
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "O monta-carga do porão. Cabe uma coisa de cada vez."
+        ]
+       ]
+      },
+      {
+       "v": "item",
+       "item": "sino",
+       "do": [
+        [
+         "take",
+         "sino"
+        ],
+        [
+         "set",
+         "bell_up"
+        ],
+        [
+         "sfx",
+         "whoosh"
+        ],
+        [
+         "say",
+         "caio",
+         "Subindo, sino! Alguém tá aí em cima?"
+        ],
+        [
+         "obj",
+         "O sino subiu. No hall, pegue o sino no monta-carga."
+        ]
+       ]
+      }
+     ]
+    },
+    "bench3": {
+     "name": "bancada de descanso",
+     "at": [
+      -4.2,
+      0.2
+     ],
+     "rules": [
+      {
+       "v": "look",
+       "do": [
+        [
+         "say",
+         "$a",
+         "Uma bancada com uma almofada. Escrito a giz: 'DESCANSO CURTO. UMA VEZ POR SALA.'"
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "if": [
+        "rest_caldeira"
+       ],
+       "do": [
+        [
+         "say",
+         "caio",
+         "Descansei aqui nessa sala já. O Mestre cobra o descanso caro."
+        ]
+       ]
+      },
+      {
+       "v": "use",
+       "do": [
+        [
+         "set",
+         "rest_caldeira"
+        ],
+        [
+         "call",
+         "rest"
+        ]
+       ]
+      }
+     ]
+    }
+   }
+  }
+ },
+ "cutscenes": {
+  "intro": [
+   [
+    "card",
+    "Capítulo 2\nA Vez do Ladino"
+   ],
+   [
+    "ui",
+    "team"
+   ],
+   [
+    "mestre",
+    "Iniciativa 19. A vez é do Ladino."
+   ],
+   [
+    "say",
+    "caio",
+    "Claro. Tinha que ser a minha. E tinha que ser a do porão."
+   ],
+   [
+    "goto",
+    "caio",
+    "adega"
+   ],
+   [
+    "view",
+    "adega"
+   ],
+   [
+    "sfx",
+    "door"
+   ],
+   [
+    "mestre",
+    "No porão, quem desce desce só. A voz desce junto. A mão não."
+   ],
+   [
+    "obj",
+    "Ache o bocal do tubo para falar com o hall."
+   ]
+  ],
+  "ending": [
+   [
+    "sfx",
+    "bell"
+   ],
+   [
+    "fx",
+    "shake"
+   ],
+   [
+    "wait",
+    1.2
+   ],
+   [
+    "mestre",
+    "Primeira badalada. Restam doze."
+   ],
+   [
+    "say",
+    "$a",
+    "Foi o Caio quem abriu. Mas eu juro que ele só abriu porque a gente ajudou."
+   ],
+   [
+    "card",
+    "A porta da flecha acorda.\nIniciativa 16.\nA vez é da Patrulheira."
+   ],
+   [
+    "card",
+    "Continua em: Capítulo 3\nA Vez da Patrulheira"
+   ],
+   [
+    "end"
+   ]
+  ]
+ }
+}

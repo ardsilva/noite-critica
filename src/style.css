@@ -114,3 +114,11 @@ body.cut #stage::before { content: ''; position: absolute; left: 0; right: 0; to
   .bubble { font-size: 21px; max-width: 260px; } #mestre .txt { font-size: 24px; }
 }
 @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01s !important; transition-duration: 0.01s !important; } }
+
+/* escolha de equipe (capitulo 2) */
+.mini .team { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 8px 0 16px; }
+.mini .pick { width: 76px; padding: 8px 4px; background: #fff8dc; color: #6a1fb0; border: 2px solid #3a2418; font-size: 30px; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.mini .pick small { font-family: var(--ui); font-size: 18px; color: #2a1d12; }
+.mini .pick:hover { background: #f1e3a8; }
+.mini .pick.on { background: var(--gold); border-color: #fff; transform: scale(1.06); }
+.mini button.cancel:disabled { opacity: 0.4; }

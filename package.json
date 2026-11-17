@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "assets": "python3 blender/build_assets.py",
-    "test": "node tools/playthrough.mjs"
+    "test": "node tools/playthrough.mjs",
+    "test:ch2": "node tools/chapter2.mjs"
   },
   "dependencies": {
     "three": "^0.187.0"
