@@ -145,6 +145,8 @@ servem para o grosso; as cenas-chave merecem Timeline), UI Toolkit para o painel
   como um segundo projeto Vercel. Atenção: builds comprimidas com Brotli precisam do cabeçalho
   `Content-Encoding` configurado em `vercel.json`, e builds acima de ~100 MB pedem os dados em
   storage externo (Supabase Storage ou R2).
+- **Hosts que não servem `.glb`** (ex.: páginas Artifact do Claude): `VITE_ASSETS=json npx vite build --base ./`
+  e embrulhar cada GLB em `{ "b64": ... }` com o nome `<arquivo>.glb.json`.
 - **Desktop**: itch.io / Steam, a partir do Unity.
 
 ## 8. Serviços (planejado, nada disso existe na v0.1)

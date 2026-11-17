@@ -793,7 +793,10 @@ function endChapter() {
 }
 async function boot() {
   const loader = new GLTFLoader(), base = import.meta.env.BASE_URL + 'assets/';
-  const load = (f) => loader.loadAsync(base + f);
+  // VITE_ASSETS=json: os GLB vao embrulhados em JSON/base64 (hosts que nao servem .glb)
+  const load = import.meta.env.VITE_ASSETS === 'json'
+    ? async (f) => { const { b64 } = await (await fetch(base + f + '.json')).json(); return loader.parseAsync(Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)).buffer, ''); }
+    : (f) => loader.loadAsync(base + f);
   const files = [...content.party.map((k) => `kid_${k.id}.glb`), ...Object.values(content.rooms).map((r) => r.asset)];
   let done = 0;
   const res = await Promise.all(files.map((f) => load(f).then((g) => { $('loading').textContent = `Carregando… ${Math.round((++done / files.length) * 100)}%`; return g; })));

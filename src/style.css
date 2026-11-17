@@ -1,4 +1,4 @@
-:root {
+:root { color-scheme: dark;
   --ink: #0b0812; --panel: #150f22; --panel2: #1f1733; --line: #3a2c5c; --gold: #e2b93b; --bone: #efe6c8;
   --mestre: #c9a3ff; --ui: 'VT323', 'Courier New', monospace; --display: 'Pirata One', Georgia, serif;
   --panel-h: 168px;
