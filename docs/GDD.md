@@ -120,7 +120,9 @@ Detalhes narrativos em [NARRATIVA.md](NARRATIVA.md); puzzles do capítulo 1 em [
 - Meta: trilha chiptune + instrumentos de brinquedo (kalimba, melódica, teclado de plástico).
   O instrumento do Leo é diegético: as 4 notas da senha são o motivo do tema principal.
 
-## 11. Perguntas em aberto para o diretor
+## 11. Perguntas para o diretor (respondidas em 2026-11-17)
+
+**Decisões:** (1) Creatura Crunch: ignorar, nada dele entra no design. (2) Equipe de **3 de 6**: no cap. 2, Caio obrigatório + 2 apoios entre os 5 restantes (opção A). (3) **PT-BR primeiro**, EN depois do cap. 2. (4) **Tudo grátis por ora**, sem Stripe/Supabase. Perguntas originais abaixo, para histórico.
 
 1. **Creatura Crunch, o Monstro**: não achamos o jogo com esse nome. O que você quer trazer dele:
    o monstro que come coisas, o humor, a estrutura? Com isso definimos se o Mímico vira mascote
