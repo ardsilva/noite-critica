@@ -1,5 +1,7 @@
 # Noite Crítica
 
+**Jogar agora: https://noite-critica.vercel.app**
+
 **Um point-and-click 2.5D em capítulos.** Halloween de 1987: seis crianças jogam um RPG de mesa
 achado na varanda de uma mansão abandonada. O dado de osso tira 1. A mansão vira a masmorra, a casa
 é o Mestre, e cada fantasia vira uma classe de verdade.
@@ -23,7 +25,7 @@ contra o sobrenatural e do RPG de mesa clássico; nomes, personagens, arte, text
 | Áudio | Sintetizado em tempo real (WebAudio). Sem arquivos de áudio. |
 | **Projeto Unity** | **Scaffold C# não compilado.** Porta do intérprete de regras; falta abrir no editor (ver `unity/README.md`). |
 | Save, mobile/toque, localização | Não existem ainda (ver roadmap). |
-| Publicação na Vercel | Ver seção *Publicar* abaixo. |
+| Publicação na Vercel | **No ar: https://noite-critica.vercel.app** (deploy via CLI; falta conectar o Git para publicar a cada push). |
 
 ### Por que web primeiro, se o alvo é Unity + Blender?
 
@@ -113,7 +115,7 @@ git push -u origin main
 ```
 
 Depois, na Vercel: **Add New → Project → importar `noite-critica`** (preset Vite, sem variáveis de
-ambiente). Cada push em `main` publica.
+ambiente). Cada push em `main` publica depois de `vercel git connect` (ou da integração GitHub da Vercel).
 
 ## Roadmap resumido
 
