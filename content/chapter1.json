@@ -1,0 +1,425 @@
+{
+  "meta": {
+    "title": "Noite Crítica",
+    "chapter": 1,
+    "chapterTitle": "O Limiar",
+    "version": "0.1.0",
+    "schema": "Fonte única de verdade do capítulo. Lida pela build web (src/) e pelo intérprete Unity (unity/Assets/Scripts). Coordenadas em metros, eixo Y para cima, [x, z] no chão. Efeitos são tuplas [op, ...args]; ver docs/TECH.md."
+  },
+  "start": { "cutscene": "intro", "active": "leo", "items": ["doces"] },
+  "party": [
+    { "id": "bia",   "name": "Bia",   "cls": "Curandeira",  "verb": "Curar",    "icon": "✚", "color": "#ff9aa2", "ini": 8,  "hp": 3, "emb": "uma cruz" },
+    { "id": "caio",  "name": "Caio",  "cls": "Ladino",      "verb": "Gazua",    "icon": "🗝", "color": "#aab4d8", "ini": 19, "hp": 3, "emb": "uma chave" },
+    { "id": "tomas", "name": "Tomás", "cls": "Cavaleiro",   "verb": "Força",    "icon": "⚔", "color": "#7fb4ff", "ini": 3,  "hp": 3, "emb": "uma espada" },
+    { "id": "iris",  "name": "Íris",  "cls": "Maga",        "verb": "Magia",    "icon": "★", "color": "#c79bff", "ini": 14, "hp": 3, "emb": "uma estrela" },
+    { "id": "leo",   "name": "Leo",   "cls": "Bardo",       "verb": "Tocar",    "icon": "♪", "color": "#ffcf5c", "ini": 11, "hp": 3, "emb": "uma nota musical" },
+    { "id": "nina",  "name": "Nina",  "cls": "Patrulheira", "verb": "Rastrear", "icon": "➶", "color": "#8fe08a", "ini": 16, "hp": 3, "emb": "uma flecha" }
+  ],
+  "items": {
+    "doces": { "name": "saco de doces", "icon": "🍬", "rules": [
+      { "v": "look", "do": [["say", "$a", "O saque da noite: chiclete, pirulito e um monte de bala de menta embrulhada em papel-alumínio. Brilha mais que a lua."]] }
+    ]},
+    "bloco": { "name": "bloco da sessão", "icon": "📒", "rules": [
+      { "v": "look", "do": [["read", "Bloco da sessão", "INICIATIVA (rolada lá fora)\n\nCaio, o Ladino ........ 19\nNina, a Patrulheira .... 16\nÍris, a Maga ........... 14\nLeo, o Bardo ........... 11\nBia, a Curandeira ...... 8\nTomás, o Cavaleiro ..... 3\n\n(o Tomás jura que o dado tá viciado)"]] }
+    ]},
+    "convite": { "name": "convite", "icon": "✉️", "rules": [
+      { "v": "look", "if": ["invite_read"], "do": [["call", "read_invite"]] },
+      { "v": "ability", "who": "iris", "if": ["invite_read"], "do": [["call", "read_invite"]] },
+      { "v": "ability", "who": "iris", "do": [
+        ["anim", "iris", "cast"], ["sfx", "spark"],
+        ["say", "iris", "São runas! Igualzinho às do livro que eu peguei na biblioteca. Deixa eu ver…"],
+        ["mestre", "Teste de Arcanismo: sucesso."],
+        ["set", "invite_read"], ["call", "read_invite"],
+        ["obj", "Acender os dois olhos da casa, devolver a argola à boca da porta e cantar a senha."]
+      ]},
+      { "v": "look", "do": [["say", "$a", "Um convite num envelope preto. As letras parecem formiga dançando. Ninguém aqui lê isso… ou lê?"]] }
+    ]},
+    "vela": { "name": "toco de vela", "icon": "🕯️", "rules": [
+      { "v": "look", "do": [["say", "$a", "Um toco de vela meio mordido. Ainda tem pavio."]] },
+      { "v": "ability", "who": "iris", "do": [["say", "iris", "Acender na mão? Melhor pôr num lugar primeiro."]] }
+    ]},
+    "anel": { "name": "argola da aldrava", "icon": "⭕", "rules": [
+      { "v": "look", "do": [["say", "$a", "Uma argola dourada, pesada, com marca de bico. É de bater em porta."]] }
+    ]}
+  },
+  "macros": {
+    "read_invite": [["read", "Convite", "AOS SEIS DA MESA\n\nA casa dorme de olhos apagados.\nAcendam os DOIS OLHOS que guardam a entrada.\nDevolvam a ARGOLA à boca que guarda a porta.\nBatam. E quando a boca perguntar,\na senha não se diz: a senha se CANTA.\n\n▲   ●   ■   ●\n\n— O Mestre"]],
+    "eyes": [["if", ["litL", "litR", "!eyes"], [
+      ["set", "eyes"], ["wait", 0.4], ["fx", "eyes_on"],
+      ["mestre", "Os dois olhos da casa se abriram. Agora ela está vendo vocês."]
+    ]]],
+    "bite": [
+      ["fx", "mimic_bite"], ["hp", "$a", -1],
+      ["mestre", "Fora da vez. O Mímico tem ataque de oportunidade: −1 PV."],
+      ["say", "$a", "O BAÚ ME MORDEU!"]
+    ]
+  },
+  "strings": {
+    "heal": ["Curativo, sopro e beijinho de mentira. Novo em folha.", "Cura: PV restaurados."],
+    "heal_none": "Tá inteiro. Eu não gasto esparadrapo à toa.",
+    "kid_look": "É {name}, {cls} da mesa. Iniciativa {ini}.",
+    "defaults": {
+      "look": ["Nada de especial.", "Parece normal. O que, nessa casa, já é suspeito."],
+      "take": ["Não dá pra levar isso.", "Minha mochila já tá cheia de doce."],
+      "use": ["Não sei o que fazer com isso.", "Isso não funciona assim."],
+      "talk": ["Não respondeu. Ainda bem.", "Conversar com isso? Ainda não cheguei nesse ponto."],
+      "item": ["Isso não combina com aquilo.", "Não vai dar certo."],
+      "ability": {
+        "bia": "Isso não se cura com curativo.",
+        "caio": "Não tem fechadura aí.",
+        "tomas": "Força bruta não resolve isso. Infelizmente.",
+        "iris": "Não tem runa nem pavio aí.",
+        "leo": "Toquei um acorde. Nada aconteceu. Público difícil.",
+        "nina": "Sem rastro, sem bicho. Nada pra seguir aqui."
+      }
+    }
+  },
+  "ui": {
+    "melody": {
+      "symbols": ["▲", "●", "■", "◆"], "answer": [0, 1, 2, 1],
+      "ok": [
+        ["voice", "Gárgula", "#9fb0c0", "Afinado. Podem entrar. Limpem os pés."],
+        ["sfx", "door"], ["hide", "st_door_closed"], ["show", "st_door_open"], ["set", "door_open"],
+        ["wait", 0.6], ["cutscene", "enter"]
+      ],
+      "fail": [
+        ["voice", "Gárgula", "#9fb0c0", "Desafinado."],
+        ["say", "leo", "Era improviso! …Tá bom. A melodia certa tá no convite."]
+      ]
+    },
+    "clock": {
+      "options": ["caio", "nina", "iris", "leo", "bia", "tomas"], "answer": "caio",
+      "ok": [["cutscene", "ending"]],
+      "fail": [["call", "bite"], ["say", "bia", "Vem cá que eu resolvo. E pensa antes de girar: quem age PRIMEIRO?"]]
+    }
+  },
+  "rooms": {
+    "exterior": {
+      "name": "Jardim da Casa Valdemar", "asset": "exterior.glb", "focus": [1.9, -1.3],
+      "camera": { "pos": [0, 5.6, 14.5], "look": [0, 3.3, -6], "fov": 44 },
+      "walk": { "minX": -10, "maxX": 9.5, "minZ": -6.1, "maxZ": 2.4,
+                "blockers": [[5.8, -3.6, 2.0], [-8.6, -6.4, 1.1], [-5.2, -2.6, 0.5], [-3.3, -6.5, 0.5], [3.3, -6.5, 0.5], [1.9, -1.3, 1.0]] },
+      "spawn": [[-0.3, -0.5, 0], [0.4, -2.9, 0], [2.3, -3.5, 0], [4.0, -2.4, 0], [4.1, -0.3, 0], [1.6, 0.9, 0]],
+      "hide": ["st_door_open", "st_ring", "st_mail_open", "st_statue_up", "st_candle", "st_flameL", "st_flameR"],
+      "hints": [
+        { "if": ["!mail_open"], "text": "Convidado recebe convite. E convite chega… pelo correio, ué." },
+        { "if": ["!invite_read"], "text": "Esse convite tá em runas. A Íris não larga aquele livro de runas por nada." },
+        { "if": ["hurt_tomas"], "text": "O Tomás machucou a mão no espinheiro. A Bia resolve com um curativo." },
+        { "if": ["!litL"], "text": "Os 'olhos' só podem ser as duas abóboras do lado da porta. A Íris tem faísca." },
+        { "if": ["!statue_moved"], "text": "A abóbora da direita tá sem vela. Tem um toco de vela na fonte, embaixo do anjo. Quem aqui é forte?" },
+        { "if": ["!got_vela"], "text": "A vela ficou solta na fonte. É só pegar." },
+        { "if": ["!litR"], "text": "Vela na abóbora da direita, e depois uma faísca da Íris." },
+        { "if": ["!raven_talked"], "text": "O corvo tá com a argola da porta no bico. A Nina fala com bicho." },
+        { "if": ["!got_ring"], "text": "'Brilhante por mais brilhante'… papel de bala brilha pra caramba." },
+        { "if": ["!ring_placed"], "text": "A argola vai na boca da gárgula da porta." },
+        { "if": ["!awake"], "text": "Argola no lugar, olhos acesos. Alguém bate na porta?" },
+        { "if": [], "text": "A senha se canta. Tá no convite: ▲ ● ■ ●. Isso é com o Leo." }
+      ],
+      "hotspots": {
+        "mailbox": { "name": "caixa de correio", "at": [-4.4, -1.7], "rules": [
+          { "v": "look", "if": ["mail_open"], "do": [["say", "$a", "Vazia agora. Só teia de aranha e uma conta de luz de 1957."]] },
+          { "v": "look", "do": [["say", "$a", "Caixa de correio enferrujada, trancada com um cadeadinho. Na plaquinha: 'O MESTRE'."]] },
+          { "v": "ability", "who": "caio", "if": ["!mail_open"], "do": [
+            ["anim", "caio", "use"], ["sfx", "unlock"],
+            ["say", "caio", "Cadeadinho de diário. Três segundos… dois… pronto."],
+            ["mestre", "Teste de Ladinagem: sucesso."],
+            ["hide", "st_mail_lock"], ["show", "st_mail_open"], ["set", "mail_open"], ["give", "convite"],
+            ["say", "caio", "Um envelope preto. 'Aos seis da mesa'. O resto tá escrito em… rabisco."]
+          ]},
+          { "v": "ability", "who": "tomas", "if": ["!mail_open"], "do": [["say", "tomas", "Se eu arrancar a tampa, amasso o que tiver dentro. Isso é serviço fino."]] },
+          { "v": "ability", "who": "iris", "if": ["!mail_open"], "do": [["say", "iris", "Minha faísca derrete o cadeado… e o correio junto. Melhor não."]] },
+          { "v": "use", "if": ["!mail_open"], "do": [["say", "$a", "Trancada. Isso pede alguém com dedos leves."]] },
+          { "v": "take", "if": ["!mail_open"], "do": [["say", "$a", "Trancada. Isso pede alguém com dedos leves."]] },
+          { "v": "use", "do": [["say", "$a", "Já pegamos o que tinha aí."]] }
+        ]},
+        "lanternL": { "name": "abóbora da esquerda", "at": [-2.7, -5.5], "rules": [
+          { "v": "look", "if": ["litL"], "do": [["say", "$a", "Acesa. E eu juro que ela piscou."]] },
+          { "v": "look", "do": [["say", "$a", "Uma abóbora-lanterna no poste. Tem um toco de vela dentro, apagado. Parece um olho fechado."]] },
+          { "v": "ability", "who": "iris", "if": ["!litL"], "do": [
+            ["anim", "iris", "cast"], ["sfx", "spark"], ["say", "iris", "Faísca!"],
+            ["hide", "st_darkL"], ["show", "st_flameL"], ["set", "litL"], ["call", "eyes"]
+          ]},
+          { "v": "use", "if": ["!litL"], "do": [["say", "$a", "Tem vela, falta fogo. Alguém aí solta faísca?"]] }
+        ]},
+        "lanternR": { "name": "abóbora da direita", "at": [2.7, -5.5], "rules": [
+          { "v": "look", "if": ["litR"], "do": [["say", "$a", "Acesa. Os dois olhos abertos. Me sinto observado."]] },
+          { "v": "look", "if": ["candleR"], "do": [["say", "$a", "Agora tem vela. Só falta acender."]] },
+          { "v": "look", "do": [["say", "$a", "Outra abóbora-lanterna. Vazia: levaram a vela. Um olho sem pupila."]] },
+          { "v": "item", "item": "vela", "do": [["take", "vela"], ["set", "candleR"], ["sfx", "pick"], ["say", "$a", "Vela no lugar. Agora falta o fogo."]] },
+          { "v": "ability", "who": "iris", "if": ["candleR", "!litR"], "do": [
+            ["anim", "iris", "cast"], ["sfx", "spark"], ["say", "iris", "Faísca!"],
+            ["hide", "st_darkR"], ["show", "st_flameR"], ["set", "litR"], ["call", "eyes"]
+          ]},
+          { "v": "ability", "who": "iris", "if": ["!candleR"], "do": [["say", "iris", "Faísca sem pavio não pega. Precisa de uma vela aí dentro."]] },
+          { "v": "use", "if": ["!candleR"], "do": [["say", "$a", "Tá vazia. Sem vela, sem olho."]] }
+        ]},
+        "fountain": { "name": "fonte seca", "at": [3.6, -2.6], "rules": [
+          { "v": "look", "if": ["got_vela"], "do": [["say", "$a", "O anjo voltou pro pedestal. Ele não parece agradecido."]] },
+          { "v": "look", "if": ["statue_moved"], "do": [["say", "$a", "O anjo tá de pé. E a vela ficou solta lá no fundo."]] },
+          { "v": "look", "do": [["say", "$a", "Uma fonte seca. O anjo de pedra caiu de cara dentro dela, no meio de um espinheiro. Tem um toco de vela preso lá embaixo."]] },
+          { "v": "take", "if": ["statue_moved", "!got_vela"], "do": [["give", "vela"], ["hide", "st_candle"], ["set", "got_vela"], ["say", "$a", "Um toco de vela. Meio mordido, mas serve."]] },
+          { "v": "use", "if": ["statue_moved", "!got_vela"], "do": [["give", "vela"], ["hide", "st_candle"], ["set", "got_vela"], ["say", "$a", "Um toco de vela. Meio mordido, mas serve."]] },
+          { "v": "take", "if": ["!statue_moved"], "do": [["say", "$a", "Não alcanço: o anjo tá em cima. E é espinho pra todo lado."]] },
+          { "v": "ability", "who": "tomas", "if": ["!thorned"], "do": [
+            ["anim", "tomas", "push"], ["wait", 0.5], ["hp", "tomas", -1], ["set", "thorned"],
+            ["say", "tomas", "AI! ESPINHO!"],
+            ["mestre", "Armadilha de espinhos. Teste de Destreza do Cavaleiro: 3. Falhou. −1 PV."],
+            ["say", "tomas", "Com a mão assim eu não levanto nem a espada."]
+          ]},
+          { "v": "ability", "who": "tomas", "if": ["hurt_tomas"], "do": [["say", "tomas", "Minha mão tá latejando. Preciso de um curativo antes."]] },
+          { "v": "ability", "who": "tomas", "if": ["!statue_moved"], "do": [
+            ["anim", "tomas", "push"], ["sfx", "stone"], ["say", "tomas", "Pelo… reino… de… PAPELÃO!"],
+            ["hide", "st_statue_fallen"], ["show", "st_statue_up", "st_candle"], ["set", "statue_moved"], ["fx", "shake"],
+            ["mestre", "Teste de Força: sucesso. O anjo volta ao pedestal."]
+          ]},
+          { "v": "ability", "who": "caio", "do": [["say", "caio", "Estátua não tem fechadura, gente."]] },
+          { "v": "ability", "who": "bia", "do": [["say", "bia", "Eu curo gente. Anjo de pedra é com pedreiro."]] }
+        ]},
+        "raven": { "name": "corvo", "at": [-6.0, -4.6], "rules": [
+          { "v": "look", "if": ["got_ring"], "do": [["say", "$a", "Tá comendo a bala com papel e tudo."]] },
+          { "v": "look", "do": [["say", "$a", "Um corvo enorme. Tem uma argola dourada no bico. E ele sabe que a gente quer."]] },
+          { "v": "ability", "who": "nina", "if": ["!raven_talked"], "do": [
+            ["anim", "nina", "cast"], ["sfx", "crow"],
+            ["say", "nina", "Crá? …Crá-crá."],
+            ["mestre", "Teste de Lidar com Animais: sucesso."],
+            ["say", "nina", "Ele disse: 'Troco. Brilhante por mais brilhante.'"],
+            ["set", "raven_talked"],
+            ["say", "nina", "Corvo é doido por coisa que brilha. O que a gente tem que brilha mais que ouro?"]
+          ]},
+          { "v": "ability", "who": "nina", "if": ["!got_ring"], "do": [["sfx", "crow"], ["say", "nina", "Ele repetiu: brilhante por mais brilhante. E me chamou de lenta."]] },
+          { "v": "item", "item": "doces", "if": ["!raven_talked"], "do": [["say", "$a", "Ofereci uma bala. Ele nem olhou. Acho que a gente não foi apresentado direito."]] },
+          { "v": "item", "item": "doces", "if": ["!got_ring"], "do": [
+            ["anim", "$a", "cast"], ["say", "$a", "Bala de menta, papel-alumínio, brilhando que nem lua. Negócio fechado?"],
+            ["sfx", "crow"], ["hide", "st_raven_ring"], ["sfx", "pick"], ["give", "anel"], ["set", "got_ring"],
+            ["mestre", "Negociação com a fauna local: sucesso."],
+            ["say", "$a", "Ele largou a argola! …e já tá de olho no resto do saco."]
+          ]},
+          { "v": "ability", "who": "leo", "do": [["anim", "leo", "play"], ["sfx", "note1"], ["say", "leo", "Ele balançou a cabeça no ritmo. Mas não largou a argola. Crítico musical."]] },
+          { "v": "ability", "who": "tomas", "do": [["say", "tomas", "Tá alto demais. E eu tenho um pouco de medo de passarinho. Não conta pra ninguém."]] },
+          { "v": "talk", "do": [["say", "$a", "Ô, passarinho… larga isso aí."], ["sfx", "crow"], ["say", "$a", "Ele disse 'crá'. Eu acho."]] },
+          { "v": "take", "do": [["say", "$a", "Tá a quatro metros de altura. E tem bico."]] }
+        ]},
+        "door": { "name": "porta da mansão", "at": [0, -5.9], "rules": [
+          { "v": "look", "if": ["ring_placed"], "do": [["say", "$a", "A gárgula tá de argola na boca. Só falta alguém ter coragem de bater."]] },
+          { "v": "look", "do": [["say", "$a", "Porta de carvalho. Sem maçaneta, sem fechadura. Só uma gárgula de pedra dormindo, de boca vazia: falta a argola da aldrava."]] },
+          { "v": "item", "item": "anel", "do": [["take", "anel"], ["show", "st_ring"], ["set", "ring_placed"], ["sfx", "pick"], ["say", "$a", "Encaixou. A gárgula mexeu a orelha. Eu vi."]] },
+          { "v": "ability", "who": "caio", "do": [["say", "caio", "Não tem fechadura. Não dá pra abrir o que não tem buraco."]] },
+          { "v": "ability", "who": "tomas", "do": [["anim", "tomas", "push"], ["sfx", "stone"], ["fx", "shake"], ["mestre", "Teste de Força contra a Porta do Mestre: impossível. Convidados não arrombam."]] },
+          { "v": "ability", "who": "leo", "if": ["awake"], "do": [["anim", "leo", "play"], ["ui", "melody"]] },
+          { "v": "ability", "who": "leo", "do": [["say", "leo", "Serenata pra porta fechada? Eu guardo pro bis."]] },
+          { "v": "use", "if": ["!ring_placed"], "do": [["say", "$a", "Bater com o quê? A aldrava tá sem argola."]] },
+          { "v": "use", "if": ["!eyes"], "do": [["sfx", "knock"], ["say", "$a", "…Nada. A casa tá de olho fechado. Literalmente."]] },
+          { "v": "use", "if": ["!awake"], "do": [
+            ["sfx", "knock"], ["wait", 0.9], ["fx", "gargoyle_wake"], ["set", "awake"],
+            ["voice", "Gárgula", "#9fb0c0", "Quem bate tem convite. Quem tem convite tem senha. Canta."],
+            ["say", "$a", "Cantar? Isso é serviço de bardo."]
+          ]},
+          { "v": "use", "do": [["voice", "Gárgula", "#9fb0c0", "Senha. Cantada, não falada."]] },
+          { "v": "talk", "if": ["awake"], "do": [["voice", "Gárgula", "#9fb0c0", "Senha. Cantada, não falada."]] }
+        ]},
+        "gate": { "name": "portão", "at": [8.0, -0.4], "rules": [
+          { "v": "look", "do": [["say", "$a", "O portão do jardim virou grade de masmorra: as barras desceram até o chão e a fechadura sumiu."]] },
+          { "v": "ability", "who": "caio", "do": [["say", "caio", "Fechadura? Que fechadura? Virou ferro liso."]] },
+          { "v": "ability", "who": "tomas", "do": [["anim", "tomas", "push"], ["mestre", "Teste de Força: nem com 20 natural."]] },
+          { "v": "use", "do": [["say", "$a", "'Ninguém sai da mesa no meio da sessão.' Tá começando a fazer sentido."]] }
+        ]},
+        "table": { "name": "mesa de jogo", "at": [1.9, 0.6], "rules": [
+          { "v": "look", "do": [["read", "Tampa da caixa", "O LIMIAR\nUm jogo para exatamente seis aventureiros.\n\nREGRA 1\nA sessão começa quando o dado para.\n\nREGRA 2\nNinguém sai da mesa no meio da sessão.\n\n(Demais regras serão reveladas\nquando for tarde demais.)"]] },
+          { "v": "take", "do": [["say", "$a", "As fichas grudaram na manta. E agora têm os nossos nomes. Ninguém escreveu isso."]] },
+          { "v": "ability", "who": "nina", "do": [["say", "nina", "Rastros: seis crianças, um corvo… e alguma coisa que arrastou a caixa da varanda até a calçada ANTES do Leo achar. A caixa veio buscar a gente."]] }
+        ]}
+      }
+    },
+    "hall": {
+      "name": "O Hall", "asset": "hall.glb",
+      "camera": { "pos": [0, 5.2, 12.2], "look": [0, 2.6, -5], "fov": 46 },
+      "walk": { "minX": -8.4, "maxX": 8.4, "minZ": -7.6, "maxZ": 1.6, "blockers": [[6.9, -5.4, 1.1], [-6.9, -5.6, 0.8], [0, -8.75, 1.4]] },
+      "spawn": [[-3.6, 0.6, 180], [-2.1, -0.2, 180], [-0.7, 0.7, 180], [0.8, -0.2, 180], [2.2, 0.7, 180], [3.6, -0.1, 180]],
+      "hide": ["dung_set", "dung_clockface"],
+      "portraits": ["leo", "bia", "caio", "nina", "tomas", "iris"],
+      "hints": [
+        { "if": ["!plaque_read"], "text": "Aquela placa em cima do relógio tá em runas. Íris!" },
+        { "if": ["!clock_open"], "text": "'O relógio marca a vez.' A portinha de vidro dele tem fechadura de verdade. Caio!" },
+        { "if": ["!hand_free"], "text": "O ponteiro tá soldado de ferrugem. Isso é força bruta, Tomás." },
+        { "if": ["!runes"], "text": "'Quem age primeiro' é iniciativa. Quem tirou mais alto lá fora? Tá no bloco da sessão." },
+        { "if": [], "text": "Gira o ponteiro pro símbolo de quem tirou a MAIOR iniciativa. Confere no bloco ou nas plaquinhas dos quadros." }
+      ],
+      "protos": {
+        "door": [
+          { "v": "look", "do": [["say", "$a", "Porta de ferro com {emb} em ouro: a porta de {name}, {cls}. Lacrada por uma linha de luz roxa."]] },
+          { "v": "ability", "who": "caio", "do": [["say", "caio", "Sem fechadura. Isso não é uma porta trancada. É uma regra."]] },
+          { "v": "ability", "who": "tomas", "do": [["anim", "tomas", "push"], ["mestre", "Teste de Força contra Regra da Casa: falha automática."]] },
+          { "v": "ability", "who": "iris", "do": [["say", "iris", "O lacre é magia do Mestre. Minha faísca só faz cócegas."]] },
+          { "v": "use", "do": [["sfx", "zap"], ["say", "$a", "Lacrada. A luz roxa dá choquinho."]] }
+        ],
+        "portrait": [
+          { "v": "look", "if": ["runes"], "do": [["say", "$a", "A plaquinha diz: '{name}, {cls}. INICIATIVA {ini}.'"]] },
+          { "v": "ability", "who": "iris", "if": ["!runes"], "do": [
+            ["anim", "iris", "cast"], ["sfx", "spark"], ["set", "runes"],
+            ["say", "iris", "As plaquinhas estão em runas. Nome, classe e… iniciativa. O número que cada um tirou lá fora."],
+            ["say", "iris", "Esta aqui: '{name}, {cls}. INICIATIVA {ini}.' Agora todo mundo consegue ler."]
+          ]},
+          { "v": "ability", "who": "iris", "do": [["say", "iris", "'{name}, {cls}. INICIATIVA {ini}.'"]] },
+          { "v": "look", "do": [["say", "$a", "É {name}, pintado a óleo, com moldura dourada. A tinta ainda tá fresca. Na plaquinha de bronze, só runas."]] },
+          { "v": "take", "do": [["say", "$a", "Tá pregado na parede. E eu não quero levar um de nós pra casa assim."]] }
+        ]
+      },
+      "hotspots": {
+        "door_bia":   { "name": "porta da cruz",    "at": [-6.4, -7.3], "proto": "door", "kid": "bia" },
+        "door_tomas": { "name": "porta da espada",  "at": [-3.4, -7.3], "proto": "door", "kid": "tomas" },
+        "door_iris":  { "name": "porta da estrela", "at": [3.4, -7.3],  "proto": "door", "kid": "iris" },
+        "door_leo":   { "name": "porta da nota",    "at": [6.4, -7.3],  "proto": "door", "kid": "leo" },
+        "door_caio":  { "name": "porta da chave",   "at": [-8.0, -4.6], "proto": "door", "kid": "caio" },
+        "door_nina":  { "name": "porta da flecha",  "at": [8.0, -4.6],  "proto": "door", "kid": "nina" },
+        "portrait_0": { "name": "retrato", "at": [-6.2, -6.6], "proto": "portrait", "kid": "leo" },
+        "portrait_1": { "name": "retrato", "at": [-4.6, -6.6], "proto": "portrait", "kid": "bia" },
+        "portrait_2": { "name": "retrato", "at": [-1.9, -6.6], "proto": "portrait", "kid": "caio" },
+        "portrait_3": { "name": "retrato", "at": [1.9, -6.6],  "proto": "portrait", "kid": "nina" },
+        "portrait_4": { "name": "retrato", "at": [4.6, -6.6],  "proto": "portrait", "kid": "tomas" },
+        "portrait_5": { "name": "retrato", "at": [6.2, -6.6],  "proto": "portrait", "kid": "iris" },
+        "plaque": { "name": "inscrição", "at": [-1.3, -6.9], "rules": [
+          { "v": "ability", "who": "iris", "do": [
+            ["anim", "iris", "cast"], ["sfx", "spark"], ["set", "plaque_read"],
+            ["read", "Inscrição", "SEIS PORTAS, SEIS VEZES.\n\nABRE-SE A PORTA\nDE QUEM AGE PRIMEIRO.\n\nO RELÓGIO MARCA A VEZ.\n\nQUEM JOGA FORA DA VEZ\nPAGA EM PV."],
+            ["say", "iris", "'Quem age primeiro'… gente, isso é iniciativa!"]
+          ]},
+          { "v": "look", "if": ["plaque_read"], "do": [["read", "Inscrição", "SEIS PORTAS, SEIS VEZES.\n\nABRE-SE A PORTA\nDE QUEM AGE PRIMEIRO.\n\nO RELÓGIO MARCA A VEZ.\n\nQUEM JOGA FORA DA VEZ\nPAGA EM PV."]] },
+          { "v": "look", "do": [["say", "$a", "Uma placa de pedra com runas roxas brilhando. Pra mim é rabisco."]] }
+        ]},
+        "clock": { "name": "relógio do hall", "at": [0, -7.0], "rules": [
+          { "v": "look", "if": ["hand_free"], "do": [["say", "$a", "Seis símbolos, um ponteiro solto. É só escolher pra onde apontar. Só."]] },
+          { "v": "look", "if": ["clock_open"], "do": [["say", "$a", "Vitrine aberta. Mas o ponteiro tá soldado de ferrugem."]] },
+          { "v": "look", "do": [["say", "$a", "Um relógio de pêndulo parado. No lugar das horas, seis símbolos: os mesmos das portas. Um ponteiro só, travado entre dois. A portinha de vidro tá trancada."]] },
+          { "v": "ability", "who": "caio", "if": ["!clock_open"], "do": [
+            ["anim", "caio", "use"], ["sfx", "unlock"], ["hide", "st_clock_glass"], ["set", "clock_open"],
+            ["say", "caio", "Uma fechadura de verdade! Finalmente alguém me respeita nessa casa."],
+            ["mestre", "Teste de Ladinagem: sucesso."]
+          ]},
+          { "v": "ability", "who": "tomas", "if": ["!clock_open"], "do": [["say", "tomas", "Quebrar o vidro? Sete anos de azar, NESSA casa? Tô fora."]] },
+          { "v": "ability", "who": "tomas", "if": ["!hand_free"], "do": [
+            ["anim", "tomas", "push"], ["sfx", "stone"], ["set", "hand_free"],
+            ["say", "tomas", "Gira… ferrugem!"],
+            ["mestre", "Teste de Força: sucesso. O ponteiro agora obedece."]
+          ]},
+          { "v": "use", "if": ["!clock_open"], "do": [["say", "$a", "A portinha de vidro tá trancada. Essa aqui tem fechadura."]] },
+          { "v": "use", "if": ["!hand_free"], "do": [["say", "$a", "O ponteiro não mexe. Ferrugem de cem anos."]] },
+          { "v": "use", "if": ["low"], "do": [["say", "$a", "Com 1 PV eu não encosto nisso. BIA!"]] },
+          { "v": "use", "do": [["ui", "clock"]] }
+        ]},
+        "mimic": { "name": "baú", "at": [5.4, -4.4], "rules": [
+          { "v": "look", "do": [["say", "$a", "Um baú. Com dentes. E ele tá respirando."]] },
+          { "v": "ability", "who": "leo", "do": [["anim", "leo", "play"], ["sfx", "note0"], ["say", "leo", "Ele… ronronou? Continua sendo um baú com dentes."]] },
+          { "v": "ability", "who": "nina", "do": [["say", "nina", "Rastros: esse baú ANDOU. Veio do canto até aqui e parou de frente pro relógio. Ele tá de guarda."]] },
+          { "v": "ability", "who": "caio", "do": [["say", "caio", "Eu abro baú. Eu não abro baú que abre a gente."]] },
+          { "v": "talk", "do": [["sfx", "roar"], ["say", "$a", "Ele rosnou. Conversa encerrada."]] },
+          { "v": "use", "do": [["say", "$a", "Eu é que não ponho a mão aí."]] },
+          { "v": "take", "do": [["say", "$a", "Eu é que não ponho a mão aí."]] }
+        ]},
+        "armor": { "name": "armadura", "at": [-5.6, -4.5], "rules": [
+          { "v": "look", "do": [["say", "$a", "Uma armadura vazia segurando uma alabarda. Vazia. Eu acho. Eu espero."]] },
+          { "v": "ability", "who": "tomas", "do": [["say", "tomas", "Colega de classe! …Ela é de ferro de verdade. A minha é de caixa de geladeira."]] },
+          { "v": "talk", "do": [["say", "$a", "Não respondeu. Ótimo. Continua assim."]] }
+        ]},
+        "mosaic": { "name": "mosaico do dado", "at": [0, -1.4], "rules": [
+          { "v": "look", "do": [["say", "$a", "Um mosaico em forma de dado de vinte lados. O Dado de Osso tá parado bem no meio, com o 1 pra cima. Debochando."]] },
+          { "v": "take", "do": [["say", "$a", "O dado não sai do chão."], ["mestre", "O dado anda quando a cena anda."]] },
+          { "v": "ability", "who": "nina", "do": [["say", "nina", "Rastros no pó: marca de arrasto recente na frente de UMA porta só. A da chave."]] }
+        ]}
+      }
+    }
+  },
+  "cutscenes": {
+    "intro": [
+      ["room", "exterior"],
+      ["cam", [-7, 10, 19], [-1, 6, -10], 0],
+      ["card", "31 de outubro de 1987\nVila de Santa Coruja"],
+      ["cam", [3, 7, 16], [0, 5, -10], 7],
+      ["card", "Toda cidade tem uma casa\nonde ninguém toca a campainha."],
+      ["cam", [1.9, 2.5, 5.2], [1.9, 0.9, -1.3], 3.5],
+      ["wait", 3.2],
+      ["say", "leo", "Achei na varanda da Casa Valdemar. Embrulhada pra presente. Sem cartão."],
+      ["say", "bia", "Você pegou uma caixa na varanda da casa mal-assombrada. No Halloween. Leo."],
+      ["say", "leo", "'O LIMIAR: um jogo para exatamente seis aventureiros.' Somos seis! É o destino!"],
+      ["say", "iris", "Não tem manual. Só seis fichas em branco, um dado de osso e duas regras na tampa."],
+      ["say", "iris", "Um: a sessão começa quando o dado para. Dois: ninguém sai da mesa no meio da sessão."],
+      ["say", "caio", "Regra três: quem achou a caixa divide os doces com quem não reclamou."],
+      ["say", "nina", "O corvo daquela árvore tá olhando pra gente desde que a gente sentou. Só avisando."],
+      ["say", "tomas", "Bora logo! Iniciativa! Eu sou o cavaleiro, eu vou na frente!"],
+      ["sfx", "dice"], ["wait", 0.7],
+      ["say", "caio", "Dezenove."],
+      ["say", "nina", "Dezesseis."],
+      ["say", "iris", "Catorze. Aceitável."],
+      ["say", "leo", "Onze. O bardo se guarda pro final."],
+      ["say", "bia", "Oito…"],
+      ["say", "tomas", "…Três. Esse dado tá viciado."],
+      ["give", "bloco"],
+      ["say", "leo", "Agora o dado de osso. Tomás, rola pra ver quem bate na porta."],
+      ["anim", "tomas", "cast"], ["sfx", "dice"],
+      ["cam", [0.5, 2.6, 4.5], [0, 1.2, -9], 3.2],
+      ["d20", [[2.2, 0.1, -1.4], [1.2, 0.1, -3.2], [0.3, 0.1, -5.6], [0.1, 0.45, -7.0], [0, 0.6, -8.4], [0, 0.6, -9.55]], 3.6],
+      ["say", "nina", "Dado não sobe degrau."],
+      ["wait", 0.5],
+      ["mestre", "1."],
+      ["fx", "thunder"], ["wait", 0.5],
+      ["cam", [0, 5.6, 14.5], [0, 4.2, -6], 2.5],
+      ["fx", "windows_on"], ["wait", 2.2],
+      ["say", "bia", "As luzes. Não mora ninguém aí faz trinta anos."],
+      ["fx", "gate_slam"], ["wait", 0.6],
+      ["say", "caio", "O portão fechou. E a fechadura… sumiu."],
+      ["say", "tomas", "Gente. Minha espada de papelão tá PESADA."],
+      ["say", "iris", "Minha varinha acendeu. Isso era uma vela de aniversário colada num lápis!"],
+      ["mestre", "Mesa completa. Seis jogadores, seis fichas."],
+      ["mestre", "Eu sou o MESTRE. A sessão começou. E ninguém sai da mesa no meio da sessão."],
+      ["mestre", "Primeira cena: a porta. Convidados não arrombam. Convidados são… convidados."],
+      ["say", "leo", "Tá. Fui eu. Podem falar."],
+      ["camreset", 2],
+      ["set", "started"],
+      ["obj", "Entrar na mansão. (O Mestre avisou: convidados são convidados.)"],
+      ["title", "CAPÍTULO 1", "O Limiar"]
+    ],
+    "enter": [
+      ["card", "A porta se abre sozinha.\nNinguém lembra de ter decidido entrar."],
+      ["room", "hall"],
+      ["cam", [0, 3.4, 9.5], [0, 2.6, -6], 0],
+      ["sfx", "slam"], ["fx", "shake"], ["wait", 0.8],
+      ["say", "bia", "A porta. Sumiu. Virou parede."],
+      ["say", "leo", "Oi?… Tem alguém em casa?"],
+      ["fx", "chandelier"], ["wait", 1.0],
+      ["say", "nina", "Tudo limpo. Nem um grão de pó. Alguém mora aqui."],
+      ["say", "iris", "Ou alguma COISA."],
+      ["sfx", "dice"],
+      ["d20", [[0, 0.1, 3.0], [0.4, 0.1, 0.5], [-0.3, 0.1, -2.0], [0, 0.2, -3.6]], 2.4],
+      ["mestre", "Jogadores à mesa. O cenário… está fraco. Deixa eu arrumar."],
+      ["fx", "transform_hall"], ["wait", 3.4],
+      ["say", "tomas", "O HALL VIROU UMA MASMORRA!"],
+      ["say", "caio", "Seis portas. Cada uma com um símbolo. Aquela ali é uma chave. Gostei daquela."],
+      ["cam", [0, 4.4, 1.5], [0, 4.7, -9], 2.5], ["wait", 2.6],
+      ["say", "bia", "Os quadros… somos nós. Pintados a óleo. Com moldura e tudo."],
+      ["say", "nina", "Tem mais quadros lá em cima, no escuro. Crianças de roupa antiga. 1957… 1931…"],
+      ["mestre", "CAMPANHA: O LIMIAR. Seis portas, seis provações. Uma para cada ficha."],
+      ["mestre", "OBJETIVO: levar o Dado de Osso até a Mesa do Mestre, no sótão, antes da décima terceira badalada."],
+      ["mestre", "Quem chegar a zero PV, fica. Na parede. Sempre cabe mais um quadro."],
+      ["mestre", "Rolem iniciativa. …Ah, é. Já rolaram."],
+      ["say", "iris", "Então é isso. A gente joga até o fim… ou vira decoração."],
+      ["camreset", 2.2],
+      ["set", "in_hall"],
+      ["obj", "Seis portas, todas fechadas. Descobrir qual abre primeiro, e por quê."],
+      ["title", "O HALL", "Seis portas. Todas fechadas."]
+    ],
+    "ending": [
+      ["fx", "clock_strike"], ["wait", 1.6],
+      ["mestre", "Iniciativa 19. A vez é do Ladino."],
+      ["cam", [-2.5, 2.8, -0.5], [-9.75, 1.9, -5.6], 2.2], ["wait", 2.3],
+      ["fx", "open_caio"], ["sfx", "door"], ["wait", 1.2],
+      ["say", "caio", "Claro. Tinha que ser a minha. E tinha que ser a do porão."],
+      ["sfx", "roar"], ["fx", "shake"], ["wait", 1.3],
+      ["say", "tomas", "Isso foi a barriga de alguém?"],
+      ["say", "nina", "Não. Isso tem quatro patas. Talvez seis."],
+      ["say", "bia", "PV de todo mundo anotado. Ninguém vira quadro hoje."],
+      ["say", "leo", "…Eu só queria dizer que a caixa era MUITO bonita."],
+      ["mestre", "Fim da primeira cena. Vocês abriram uma porta. Faltam cinco. E a descida."],
+      ["title", "FIM DO CAPÍTULO 1", "Continua em: Capítulo 2, A Vez do Ladino"],
+      ["end"]
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+node_modules
+dist
+.vercel
+tools/shots
+*.blend1
+unity/Library
+unity/Temp
+unity/Logs
+unity/obj
+unity/UserSettings

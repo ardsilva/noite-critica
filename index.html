@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Noite Crítica — Capítulo 1: O Limiar</title>
+  <meta name="description" content="Point-and-click 2.5D: seis crianças, uma noite de Halloween, um RPG de mesa que virou masmorra.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=VT323&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>">
+</head>
+<body>
+  <div id="app">
+    <div id="stage">
+      <canvas id="c"></canvas>
+      <div id="bubbles"></div>
+      <div id="mestre"></div>
+      <div id="card"></div>
+      <div id="title"></div>
+      <div id="objective"></div>
+      <div id="toasts"></div>
+      <div id="flash"></div>
+      <div id="skip">Clique: avançar &nbsp;·&nbsp; Esc: pular cena</div>
+      <div id="tools"><button id="hintbtn" title="Pedir dica (H)">?</button><button id="mutebtn" title="Som (M)">♪</button></div>
+    </div>
+    <div id="panel">
+      <div id="party"></div>
+      <div id="mid"><div id="sentence"></div><div id="verbs"></div></div>
+      <div id="inv"></div>
+    </div>
+    <div id="tooltip"></div>
+    <div id="overlay"></div>
+    <div id="menu" class="on">
+      <div class="box">
+        <p class="pre">um point-and-click em capítulos</p>
+        <h1>Noite Crítica</h1>
+        <p class="sub">Capítulo 1: O Limiar</p>
+        <p class="blurb">Halloween de 1987. Seis crianças, uma caixa de RPG achada na varanda errada e um dado de osso que tirou 1.<br>A mansão virou a masmorra. A casa é o Mestre. E ninguém sai da mesa no meio da sessão.</p>
+        <button id="start" disabled>Começar a sessão</button>
+        <p id="loading">Carregando…</p>
+        <p class="keys">Mouse: andar e interagir · botão direito: olhar · 1-6: trocar de criança · Q W E R T: verbos · H: dica · M: som</p>
+        <p class="ver">v0.1 · vertical slice web · <a href="https://github.com/ardsilva/noite-critica" target="_blank" rel="noopener">código e GDD</a></p>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
